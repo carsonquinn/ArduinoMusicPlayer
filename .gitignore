@@ -1,0 +1,11 @@
+# ignore the build folder
+build-mega2560/
+
+# ignore VM executable file (is used to share files between my OS and linux VM)
+VM
+
+# ignore .DS_Store binary
+.DS_Store
+
+# ignore .zip submissions
+.zip
