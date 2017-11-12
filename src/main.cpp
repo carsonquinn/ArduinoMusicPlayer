@@ -4,6 +4,7 @@
 #include <Adafruit_ILI9341.h>
 #include <TMRpcm.h>
 
+
 #define JOY_Y A1
 #define JOY_X A0
 #define JOY_SEL 2
@@ -17,6 +18,20 @@
 #define OVERSAMPLING_Q 1
 #define NORMAL_Q 0
 
+#define MUSIC_FILES 30
+
+#define THUMB_GUI 0
+#define MUSIC_GUI 1
+
+#define MUSIC_VOL 0
+#define MUSIC_REW 1
+#define MUSIC_PLAY 2
+#define MUSIC_FOR 3
+#define MUSIC_LOOP 4
+#define MUSIC_TIME 5
+
+
+// library to play sounds
 TMRpcm tmr;
 
 // lcd screen and touch screen initialization
@@ -24,29 +39,11 @@ Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 
 File root;
 
-void printDir(File dir, int numTabs) {
-  while (true) {
+// to scroll through music
+String titles[MUSIC_FILES];
+String currentTitle;
 
-    File entry =  dir.openNextFile();
-    if (! entry) {
-      // no more files
-      break;
-    }
-    for (uint8_t i = 0; i < numTabs; i++) {
-      Serial.print('\t');
-    }
-    Serial.print(entry.name());
-    if (entry.isDirectory()) {
-      Serial.println("/");
-      printDir(entry, numTabs + 1);
-    } else {
-      // files have sizes, directories do not
-      Serial.print("\t\t");
-      Serial.println(entry.size(), DEC);
-    }
-    entry.close();
-  }
-}
+using namespace std;
 
 void setup(){
   init();
@@ -71,25 +68,48 @@ void setup(){
     Serial.println("Initialized");
   }
 
-  root = SD.open("/");
-  printDir(root, 0);
-
+  // basic audio setup
   tmr.setVolume(MAX_VOL);
   tmr.quality(NORMAL_Q);
+}
+
+// get music file titles
+void getMusicFiles(File dir, String *titlesArr) {
+  // to keep count
+  int i = 0;
+
+  while (true) {
+
+    File entry =  dir.openNextFile();
+    // no more files
+    if (!entry) break;
+
+    // store in array if the file is of type .wav
+    if (!entry.isDirectory()) {
+      String name = entry.name();
+
+      if (name.endsWith(".WAV") && !name.startsWith("_")){
+        String song = name.substring(0, name.length() - 4);
+        *(titlesArr + i) = song;
+        Serial.println(song);
+        i++;
+      }
+
+    }
+    entry.close();
+  }
 }
 
 int main(){
   setup();
 
+  // go into SD card main directory and get titles
+  root = SD.open("/");
+  getMusicFiles(root, &titles[0]);
+
   // main loop
   while(true){
 
-    int selVal = digitalRead(JOY_SEL);
-
-    if (selVal == LOW){
-      Serial.println("low");
-      tmr.play("nothot.wav", 30);
-      delay(100);
     }
 
   }
