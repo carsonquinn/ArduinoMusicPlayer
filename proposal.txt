@@ -24,26 +24,26 @@ list or thumbnail view, the only time you can play music is when you're on the
 music GUI
 
 Milestones:
-1.	Nov 14
-	Just have the basic music playing and selection running over Command line/
-  serial/physical button. Implement some other features like volume control via
-  joystick and have a framework for GUI.
+1. Nov 14
+   Just have the basic music playing and selection running over Command line/
+	 serial/physical button. Implement some other features like volume control via
+   joystick and have a framework for GUI.
 
-2.	Nov 24
-	Write the GUI base and Start packing in the stuff in the GUI. Have empty spaces
-  for the features like play/pause and volume and basically have everything running
-  except auxiliary features
+2. Nov 24
+   Write the GUI base and Start packing in the stuff in the GUI. Have empty spaces
+   for the features like play/pause and volume and basically have everything running
+   except auxiliary features
 
-3.	Dec 2
-	Implement all the planned auxiliary features, clean up the GUI and implement the
-  button bitmaps. The buttons might not do anything and we would end up having only
-  joystick control for volume and play/pause and different selections on the screen
-  for scrolling if we have processing power issues.
+3. Dec 2
+   Implement all the planned auxiliary features, clean up the GUI and implement the
+	 button bitmaps. The buttons might not do anything and we would end up having only
+   joystick control for volume and play/pause and different selections on the screen
+	 for scrolling if we have processing power issues.
 
-4.	Stretch goals
-	Have touch screen input instead of joystick. Implement stereo system instead of
-  mono. Read data to display directly from wav files than a specific .txt file for
-  information
+4. Stretch goals
+   Have touch screen input instead of joystick. Implement stereo system instead of
+	 mono. Read data to display directly from wav files than a specific .txt file for
+	 information
 
 Note:
 Though this project might seem like a stretch, a lot of features and things we're
