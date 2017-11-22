@@ -3,7 +3,8 @@
 #include <SD.h>
 #include <Adafruit_ILI9341.h>
 #include <TMRpcm.h>
-
+#include "Adafruit_GFX.h"
+#include "playscreen.h"
 
 #define JOY_Y A1
 #define JOY_X A0
@@ -30,13 +31,15 @@
 #define MUSIC_LOOP 4
 #define MUSIC_TIME 5
 
+#define DISPLAY_WIDTH 320
+#define DISPLAY_HEIGHT 240
 
 // library to play sounds
 TMRpcm tmr;
 
 // lcd screen and touch screen initialization
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
-
+PlayScreen ps = PlayScreen();
 File root;
 
 // to scroll through music
@@ -57,6 +60,7 @@ void setup(){
 
   // must come before SD.begin() ...
   tft.begin();
+  tft.setRotation(3);
 
   Serial.print("Initializing SD card...");
 
@@ -106,13 +110,15 @@ int main(){
   // go into SD card main directory and get titles
   root = SD.open("/");
   getMusicFiles(root, &titles[0]);
+  tft.fillScreen(0xFFFF);
 
-  // main loop
-  while(true){
-
-    }
-
+  ps.drawPlay(1,tft);
+  ps.drawAlbum(tft);
+  int progress=0;
+  while(1){
+    delay(500);
+    ps.drawProgressBar(progress,tft);
+    progress++;
   }
-
   return 0;
 }
