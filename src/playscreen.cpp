@@ -1,5 +1,5 @@
 /***
-This class will handle all UI elements on the play screen. It will handle all the drawing and also have a 
+This class will handle all UI elements on the play tft. It will handle all the drawing and also have a 
 function to handle touch input and change the UI elements accordingly.
 ***/
 #include "Adafruit_GFX.h"    // Core graphics library
@@ -28,7 +28,7 @@ function to handle touch input and change the UI elements accordingly.
 //album image size
 #define ALBUM_W 150
 #define ALBUM_H 150
-//Distance from the top and left edge of the screen to the album
+//Distance from the top and left edge of the tft to the album
 #define ALBUM_PADDING_TOP 10
 #define ALBUM_PADDING_LEFT 10
 //position of the text CENTER
@@ -36,30 +36,31 @@ function to handle touch input and change the UI elements accordingly.
 #define TEXT_Y 215
 //characters are 5x8 pixels.The following will change the scale 
 #define TEXT_SCALE 2
-PlayScreen::PlayScreen(){
-
+//dafruit_ILI9341 *tft;
+PlayScreen::PlayScreen(Adafruit_ILI9341* tft){
+	this->tft = tft;
 }
 ///this function takes in the x,y,value of the center of the button and the radius
 //also takes in the state which is pressed or not pressed
-void PlayScreen::drawPlay(int state,Adafruit_ILI9341 tft){
+void PlayScreen::drawPlay(int state){
 	//the button will be drawn differently depending on state(pressed or not pressed). NOT YET IMPLEMENTED
 	//draw the play button
-	tft.fillCircle(PB_X,PB_Y,PB_R,LIGHTGREY);
-	tft.fillTriangle(PB_X-PB_R*0.4,PB_Y+PB_R*0.4,PB_X-PB_R*0.4,PB_Y-PB_R*0.4,PB_X+PB_R*0.4,PB_Y,WHITE);
+	tft->fillCircle(PB_X,PB_Y,PB_R,LIGHTGREY);
+	tft->fillTriangle(PB_X-PB_R*0.4,PB_Y+PB_R*0.4,PB_X-PB_R*0.4,PB_Y-PB_R*0.4,PB_X+PB_R*0.4,PB_Y,WHITE);
 }
-void PlayScreen::drawProgressBar(int progress, Adafruit_ILI9341 tft){
+void PlayScreen::drawProgressBar(int progress){
 	//draws the progress bar for the song. progress is a percentage i.e. a integer from 0 to 100
-	tft.fillRect(0,HEIGHT-PBAR_H,WIDTH*progress/100,PBAR_H,RED);
+	tft->fillRect(0,HEIGHT-PBAR_H,WIDTH*progress/100,PBAR_H,RED);
 }
-void PlayScreen::drawAlbum(Adafruit_ILI9341 tft){
+void PlayScreen::drawAlbum(){
 	//draws the album cover. currently just draw a square
-	tft.fillRect(ALBUM_PADDING_LEFT,ALBUM_PADDING_TOP,ALBUM_W,ALBUM_H,LIGHTGREY);
+	tft->fillRect(ALBUM_PADDING_LEFT,ALBUM_PADDING_TOP,ALBUM_W,ALBUM_H,LIGHTGREY);
 }
 
-void PlayScreen::drawInfo(const char* title,int len,Adafruit_ILI9341 tft){
-	tft.setCursor(TEXT_X-len*5*TEXT_SCALE/2,TEXT_Y-8*TEXT_SCALE/2);
-	tft.setTextColor(RED);
-	tft.setTextSize(TEXT_SCALE);
-	tft.print(title);
+void PlayScreen::drawInfo(const char* title,int len){
+	tft->setCursor(TEXT_X-len*5*TEXT_SCALE/2,TEXT_Y-8*TEXT_SCALE/2);
+	tft->setTextColor(RED);
+	tft->setTextSize(TEXT_SCALE);
+	tft->print(title);
 
 }

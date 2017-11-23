@@ -39,7 +39,9 @@ TMRpcm tmr;
 
 // lcd screen and touch screen initialization
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
-PlayScreen ps = PlayScreen();
+//initialize the current screen. The Play screen class controls all the UI elements.
+//Send in a pointer to the tft class so we can draw the elements
+PlayScreen ps = PlayScreen(&tft);
 File root;
 
 // to scroll through music
@@ -112,13 +114,13 @@ int main(){
   getMusicFiles(root, &titles[0]);
   tft.fillScreen(0xFFFF);
 
-  ps.drawPlay(1,tft);
-  ps.drawAlbum(tft);
+  ps.drawPlay(1);
+  ps.drawAlbum();
   int progress=0;
-  ps.drawInfo("Africa - Toto\0",13,tft);
+  ps.drawInfo("Africa - Toto\0",13);
   while(1){
     delay(500);
-    ps.drawProgressBar(progress,tft);
+    ps.drawProgressBar(progress);
     progress++;
   }
   return 0;
