@@ -115,6 +115,7 @@ int main(){
   ps.drawPlay(1,tft);
   ps.drawAlbum(tft);
   int progress=0;
+  ps.drawInfo("Africa - Toto\0",13,tft);
   while(1){
     delay(500);
     ps.drawProgressBar(progress,tft);

@@ -19,7 +19,7 @@ function to handle touch input and change the UI elements accordingly.
 //play button data
 //X Y and radius of the play button centered
 #define PB_X 240
-#define PB_Y 110 
+#define PB_Y 85 
 #define PB_R 40
 
 //height of the song progress bar
@@ -29,9 +29,13 @@ function to handle touch input and change the UI elements accordingly.
 #define ALBUM_W 150
 #define ALBUM_H 150
 //Distance from the top and left edge of the screen to the album
-#define ALBUM_PADDING_TOP 40
+#define ALBUM_PADDING_TOP 10
 #define ALBUM_PADDING_LEFT 10
-
+//position of the text CENTER
+#define TEXT_X 160
+#define TEXT_Y 215
+//characters are 5x8 pixels.The following will change the scale 
+#define TEXT_SCALE 2
 PlayScreen::PlayScreen(){
 
 }
@@ -49,5 +53,13 @@ void PlayScreen::drawProgressBar(int progress, Adafruit_ILI9341 tft){
 }
 void PlayScreen::drawAlbum(Adafruit_ILI9341 tft){
 	//draws the album cover. currently just draw a square
-	tft.fillRect(ALBUM_PADDING_LEFT,ALBUM_PADDING_TOP,ALBUM_W,ALBUM_H,BLACK);
+	tft.fillRect(ALBUM_PADDING_LEFT,ALBUM_PADDING_TOP,ALBUM_W,ALBUM_H,LIGHTGREY);
+}
+
+void PlayScreen::drawInfo(const char* title,int len,Adafruit_ILI9341 tft){
+	tft.setCursor(TEXT_X-len*5*TEXT_SCALE/2,TEXT_Y-8*TEXT_SCALE/2);
+	tft.setTextColor(RED);
+	tft.setTextSize(TEXT_SCALE);
+	tft.print(title);
+
 }

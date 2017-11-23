@@ -7,5 +7,6 @@ public:
 	void drawPlay(int state,Adafruit_ILI9341 tft);
 	void drawProgressBar(int progress, Adafruit_ILI9341 tft);
 	void drawAlbum(Adafruit_ILI9341 tft);
+	void drawInfo(const char* title,int len,Adafruit_ILI9341 tft);
 };
 #endif
