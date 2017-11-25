@@ -1,6 +1,8 @@
 #ifndef _TOUCH_H
 #define _TOUCH_H
+
 class Touch{
+
 private:
 	int tx,ty,state;
 
@@ -13,4 +15,5 @@ public:
 	int getX();
 	int getY();
 };
+
 #endif
