@@ -14,8 +14,8 @@
 #define WHITE 0xFFFF
 #define LIGHTGREY 0xC638
 
-#define D_WIDTH 320
-#define D_HEIGHT 240
+#define PS_WIDTH 320
+#define PS_HEIGHT 240
 
 // play button data
 // X,Y and radius of the play button centered
@@ -57,7 +57,7 @@ void PlayScreen::drawPlay(int state){
 
 void PlayScreen::drawProgressBar(int progress){
 	// draws the progress bar for the song. progress is a percentage i.e. a integer from 0 to 100
-	tft->fillRect(0, D_HEIGHT-PBAR_H, D_WIDTH*progress/100, PBAR_H, RED);
+	tft->fillRect(0, PS_HEIGHT - PBAR_H, PS_WIDTH*progress/100, PBAR_H, RED);
 }
 
 void PlayScreen::drawAlbum(){
