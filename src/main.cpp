@@ -2,7 +2,7 @@
 #include <SPI.h>
 #include <SD.h>
 #include <Adafruit_ILI9341.h>
-#include <TMRpcm.h>
+#include <DFRobotDFPlayerMini.h>
 #include "Adafruit_GFX.h"
 #include "playscreen.h"
 
@@ -11,54 +11,49 @@
 #define JOY_SEL 2
 #define JOY_THRESHOLD 128
 
+// TFT SD includes all the image files for
+// icons and music thumbnails, the actual music is
+// handled by a seperate sd that goes into DF Mini module
 #define TFT_DC 9
 #define TFT_CS 10
-#define SD_CHIP_SELECT 6
-
-#define MAX_VOL 7
-#define OVERSAMPLING_Q 1
-#define NORMAL_Q 0
+#define TFT_SDCS 6
 
 #define MUSIC_FILES 30
-
-#define THUMB_GUI 0
-#define MUSIC_GUI 1
-
-#define MUSIC_VOL 0
-#define MUSIC_REW 1
-#define MUSIC_PLAY 2
-#define MUSIC_FOR 3
-#define MUSIC_LOOP 4
-#define MUSIC_TIME 5
 
 #define DISPLAY_WIDTH 320
 #define DISPLAY_HEIGHT 240
 
-// library to play sounds
-TMRpcm tmr;
-
-// lcd screen and touch screen initialization
+// lcd screen and touch screen initialization, can set your own screen here
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
-//initialize the current screen. The Play screen class controls all the UI elements.
-//Send in a pointer to the tft class so we can draw the elements
+
+// Initialize music DFRobotDFPlayerMini music player
+DFRobotDFPlayerMini music_player;
+
+// initialize the current screen. The PlayScreen class controls all the UI elements
+// for PlayScreen mode. Takes the arduino screen as the argument
 PlayScreen ps = PlayScreen(&tft);
+
 File root;
 
 // to scroll through music
 String titles[MUSIC_FILES];
 String currentTitle;
 
-using namespace std;
 
 void setup(){
   init();
 
-  // Audio input for LM 386
-  tmr.speakerPin = 11;
-  // to debug
+  // DF Mini communicates over serial1
   Serial.begin(9600);
+  Serial1.begin(9600);
 
-  pinMode(JOY_SEL, INPUT_PULLUP);
+  // music player setup
+  if (!music_player.begin(Serial1)) {  //Use softwareSerial to communicate with mp3.
+    Serial.println("DFPlayer Fail");
+    while(true) { };
+  }
+  Serial.println("DFPlayer online");
+  music_player.volume(30);
 
   // must come before SD.begin() ...
   tft.begin();
@@ -66,17 +61,14 @@ void setup(){
 
   Serial.print("Initializing SD card...");
 
-  // SD initialization
-  if (!SD.begin(SD_CHIP_SELECT)) {
+  // TFT SD initialization
+  if (!SD.begin(TFT_SDCS)) {
     Serial.println("SD fail");
     while (true) { };
   } else {
     Serial.println("Initialized");
   }
 
-  // basic audio setup
-  tmr.setVolume(MAX_VOL);
-  tmr.quality(NORMAL_Q);
 }
 
 // get music file titles
@@ -110,14 +102,16 @@ int main(){
   setup();
 
   // go into SD card main directory and get titles
-  root = SD.open("/");
-  getMusicFiles(root, &titles[0]);
+  // getMusicFiles(SD.open("/"), &titles[0]);
   tft.fillScreen(0xFFFF);
 
   ps.drawPlay(1);
   ps.drawAlbum();
-  int progress=0;
+  int progress = 0;
   ps.drawInfo("Africa - Toto\0",13);
+
+  music_player.play(1);
+
   while(1){
     delay(500);
     ps.drawProgressBar(progress);

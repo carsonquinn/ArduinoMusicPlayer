@@ -1,6 +1,12 @@
 ######################################################
-# Arduino UA Child Makefile (UPDATED: 31/07/2017)
-#
+# Arduino UA Child Makefile (UPDATED: 24/11/2017)
+#	This is the Makefile developed for CMPUT 274 by Prof. Zach Friggstad
+# The main makefile derives from https://github.com/sudar/Arduino-Makefile
+# Add it to your arduino folder and change te default install location (line 32)
+# Add the libraries in line 23 to your default libraries path. For more information
+# check README. Change the default library path according to your system.
+# ignore the upload-0 and upload-1 and any other combinations. Those are for
+# multi arduino programs made in class.
 
 # Arduino UA Directory
 ifndef ARDUINO_UA_DIR
@@ -14,7 +20,7 @@ endif
 
 # Arduino Included Libraries
 ifndef ARDUINO_LIBS
-ARDUINO_LIBS = SD SPI Adafruit_GFX Adafruit_ILI9341 TouchScreen TMRpcm
+ARDUINO_LIBS = SD SPI Adafruit_GFX Adafruit_ILI9341 TouchScreen DFRobotDFPlayerMini
 endif
 
 # User Installed Library Location
