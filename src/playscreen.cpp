@@ -1,18 +1,18 @@
-/***
+/*
 	Class to handle all the UI elements for PlayScreen mode.
-***/
+*/
 
-#include "Adafruit_GFX.h"    // Core graphics library
+#include <Adafruit_GFX.h>    // Core graphics library
 #include <Adafruit_ILI9341.h> // Hardware-specific library
 #include "playscreen.h"
 
-#define BLACK 0x0000
-#define BLUE 0xADDAE6
-#define RED 0xF800
-#define CYAN 0x07FF
-#define MAGENTA 0xF81F
-#define WHITE 0xFFFF
-#define LIGHTGREY 0xC638
+#define PS_BLACK 0x0000
+#define PS_BLUE 0xADDAE6
+#define PS_RED 0xF800
+#define PS_CYAN 0x07FF
+#define PS_MAGENTA 0xF81F
+#define PS_WHITE 0xFFFF
+#define PS_LIGHTGREY 0xC638
 
 #define PS_WIDTH 320
 #define PS_HEIGHT 240
@@ -51,23 +51,23 @@ PlayScreen::PlayScreen(Adafruit_ILI9341* tft){
 void PlayScreen::drawPlay(int state){
 	// the button will be drawn differently depending on state(pressed or not pressed). NOT YET IMPLEMENTED
 	// draw the play button
-	tft->fillCircle(PB_X, PB_Y, PB_R, LIGHTGREY);
-	tft->fillTriangle(PB_X-PB_R*0.4, PB_Y+PB_R*0.4, PB_X-PB_R*0.4, PB_Y-PB_R*0.4, PB_X+PB_R*0.4, PB_Y,WHITE);
+	tft->fillCircle(PB_X, PB_Y, PB_R, PS_LIGHTGREY);
+	tft->fillTriangle(PB_X-PB_R*0.4, PB_Y+PB_R*0.4, PB_X-PB_R*0.4, PB_Y-PB_R*0.4, PB_X+PB_R*0.4, PB_Y, PS_WHITE);
 }
 
 void PlayScreen::drawProgressBar(int progress){
 	// draws the progress bar for the song. progress is a percentage i.e. a integer from 0 to 100
-	tft->fillRect(0, PS_HEIGHT - PBAR_H, PS_WIDTH*progress/100, PBAR_H, RED);
+	tft->fillRect(0, PS_HEIGHT - PBAR_H, PS_WIDTH*progress/100, PBAR_H, PS_RED);
 }
 
 void PlayScreen::drawAlbum(){
 	// draws the album cover. currently just draw a square
-	tft->fillRect(ALBUM_PADDING_LEFT, ALBUM_PADDING_TOP, ALBUM_W, ALBUM_H, LIGHTGREY);
+	tft->fillRect(ALBUM_PADDING_LEFT, ALBUM_PADDING_TOP, ALBUM_W, ALBUM_H, PS_LIGHTGREY);
 }
 
 void PlayScreen::drawInfo(const char* title,int len){
 	tft->setCursor(TEXT_X-len*5*TEXT_SCALE/2, TEXT_Y-8*TEXT_SCALE/2);
-	tft->setTextColor(RED);
+	tft->setTextColor(PS_RED);
 	tft->setTextSize(TEXT_SCALE);
 	tft->print(title);
 }
