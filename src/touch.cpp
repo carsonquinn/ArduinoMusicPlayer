@@ -9,7 +9,6 @@
 #define XP 4   // can be a digital pin
 
 // This is calibration data for the raw touch data to the screen coordinates
-// X and Y are flipped when
 #define TS_MINX 150
 #define TS_MINY 120
 #define TS_MAXX 900
@@ -22,66 +21,67 @@
 #define TH_HEIGHT 240
 
 // the state of the screen will always be one of the following
-// BDOWN and BUP will only be true for one loop. This way,we can
-// call events just once without repeating changes
-#define NOTOUCH 1
-#define BDOWN 2
-#define PRESSED 3
-#define BUP 4
+// changes will be made on button up (B_UP) only
+#define NO_TOUCH 0
+#define B_DOWN 1
+#define PRESSED 2
+#define B_UP 3
 
 TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
 
 Touch::Touch(){
-	//this constructor sets it to the default state
-	this->state = NOTOUCH;
+	// this constructor sets it to the default state
+	this->state = NO_TOUCH;
 }
 
 void Touch::processTouch(){
 
 	TSPoint p = ts.getPoint();
+
 	if (p.z < MINPRESSURE || p.z > MAXPRESSURE) {
-		//this is called when the user is not touching the screen
-			if(this->state == BDOWN){
-				this->state = BUP;
-			}else if(this->state == BUP){
-				this->state = NOTOUCH;
-			}else if(state == PRESSED){
-				this->state = BUP;
+		// this is called when the user is not touching the screen
+			if(this->state == B_DOWN){
+				this->state = B_UP;
+			}else if(this->state == B_UP){
+				this->state = NO_TOUCH;
+			}else if(this->state == PRESSED){
+				this->state = B_UP;
 			}
 			return;
-			//exit loop if there is no touch
-		}
-	if(this->state == NOTOUCH){
-		this->state = BDOWN;
-	}else if(this->state == BDOWN){
-		this->state = PRESSED;
-	}else if(this->state == BUP){
-		this->state = BDOWN;
+			// exit loop if there is no touch
 	}
 
-	// Scale from ~0->1000 to tft.width using the calibration #'s
+	if(this->state == NO_TOUCH){
+		this->state = B_DOWN;
+	}else if(this->state == B_DOWN){
+		this->state = PRESSED;
+	}else if(this->state == B_UP){
+		this->state = B_DOWN;
+	}
+
+	// Scale from 0->1000 to tft.width using the calibration #'s
 	p.x = map(p.x, TS_MINX, TS_MAXX, 0, TH_HEIGHT);
 	p.y = map(p.y, TS_MINY, TS_MAXY, 0, TH_WIDTH);
 
-	//px and py are the coordinates of the touch if the screen was in vertical orientation.
-	//Convert the coordinates to horizontal coordinates for our purpose
+	// px and py are the coordinates of the touch if the screen was in vertical orientation.
+	// Convert the coordinates to horizontal coordinates for our purpose
 	this->tx = -(p.y - TH_WIDTH);
 	this->ty = p.x;
 }
 
 bool Touch::isPressed(){
-	//whether or not the touchscreen is being constantly being held. will repeat
+	// whether or not the touchscreen is being constantly being held. Will repeat
 	return this->state == PRESSED;
 }
 
 bool Touch::isButtonDown(){
-	//whether or not the touchscreen was just touched. will not repeat
-	return this->state == BDOWN;
+	// whether or not the touchscreen was just touched. Will not repeat
+	return this->state == B_DOWN;
 }
 
 bool Touch::isButtonUp(){
-	//wherther or not the touchscreen was just released. will not repeat
-	return this->state == BUP;
+	// whether or not the touchscreen was just released. Will not repeat
+	return this->state == B_UP;
 }
 
 int Touch::getX(){

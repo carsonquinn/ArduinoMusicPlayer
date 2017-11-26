@@ -3,24 +3,24 @@
 */
 
 /*
-  Even indexed songs are in top row, odd index is bottom row
-  In total there are 6 song album arts being displayed on screen
+	Even indexed songs are in top row, odd index is bottom row
+	In total there are 6 song album arts being displayed on screen
 
-  If you're using a different screen, do your calculations first
-  On 4:3 aspect,just multiplying everything by the the ratio compared to
-  320:240 screen would do it but you would need to chage the numbers on other
-  screens
+	If you're using a different screen, do your calculations first
+	On 4:3 aspect,just multiplying everything by the the ratio compared to
+	320:240 screen would do it but you would need to chage the numbers on other
+	screens
 
-  Space division:
-    Width:
-      30 pixels on both left and right are reserved for switch screens
-      10 pixels on left and right as margin
-      15 pixels between the columns
+	Space division:
+		Width:
+			30 pixels on both left and right are reserved for switch screens
+			10 pixels on left and right as margin
+			15 pixels between the columns
 
-    Height:
-      50 pixels reserved for text box in the bottom
-      15 pixel as margin on top and bottom
-      20 pixels between the two rows
+		Height:
+			50 pixels reserved for text box in the bottom
+			15 pixel as margin on top and bottom
+			20 pixels between the two rows
 
 	The rectangle around selected item will start and end 2x2 pixels from album art
 */
@@ -56,33 +56,46 @@
 
 // adafruit_ILI9341 *tft;
 SelectScreen::SelectScreen(Adafruit_ILI9341* tft, uint8_t max_ind){
+
 	this->tft = tft;
 	// -1 since the class is 0 indexed but the songs and album art titles start from 1
 	this->max_ind = max_ind - 1;
-  this->current_max = 0;
-  this->current_ind = 0;
-  this->title = "";
+	this->current_max = 0;
+	this->current_ind = 0;
+	this->title = "";
 	this->artist = "";
 	this->album = "";
 
-	tft->drawRect(SS_SWITCH_WIDTH, SS_HEIGHT - SS_TEXT_BOX, SS_WIDTH - 2*SS_SWITCH_WIDTH, SS_TEXT_BOX - 1, SS_RED);
+	// initialization for on screen elements is carried in constructor
+	tft->drawRect(SS_SWITCH_WIDTH, SS_HEIGHT - SS_TEXT_BOX, SS_WIDTH - \
+			2*SS_SWITCH_WIDTH, SS_TEXT_BOX - 1, SS_RED);
+	tft->fillTriangle(0, SS_HEIGHT/2, (SS_SWITCH_WIDTH + SS_MARGIN_LR/2),\
+			SS_HEIGHT/2 - (SS_SWITCH_WIDTH + SS_MARGIN_LR)/2,\
+			(SS_SWITCH_WIDTH + SS_MARGIN_LR/2), SS_HEIGHT/2 + \
+			(SS_SWITCH_WIDTH + SS_MARGIN_LR)/2, SS_LIGHTGREY);
+	tft->fillTriangle(SS_WIDTH, SS_HEIGHT/2, SS_WIDTH - (SS_SWITCH_WIDTH \
+			+ SS_MARGIN_LR/2), SS_HEIGHT/2 - (SS_SWITCH_WIDTH + SS_MARGIN_LR)/2,\
+			SS_WIDTH - (SS_SWITCH_WIDTH + SS_MARGIN_LR/2), SS_HEIGHT/2 + \
+			(SS_SWITCH_WIDTH + SS_MARGIN_LR)/2, SS_LIGHTGREY);
+
 	this->setAlbums(this->current_max + 5);
 	this->setIndex(this->current_ind);
 }
 
-// draw album according to index, just handles getting and drawing album art
+// draw album art corresponding to index, handles getting and drawing album art
 // when set albums is called
 void SelectScreen::drawAlbum(uint8_t index){
 
 	// set album x and y
-	uint16_t album_x = SS_SWITCH_WIDTH + SS_MARGIN_LR + ((index % 6)/2)*(SS_ALBUM_WIDTH + SS_MARGIN_COL);
+	uint16_t album_x = SS_SWITCH_WIDTH + SS_MARGIN_LR + ((index % 6)/2)\
+			*(SS_ALBUM_WIDTH + SS_MARGIN_COL);
 	uint16_t album_y = SS_MARGIN_TB;
 
 	if ((index % 2) != 0){
 		album_y = album_y + SS_MARGIN_ROW + SS_ALBUM_HEIGHT;
 	}
 
-	// the bitmaps for albums are stored in Sd card under ssbamps directory
+	// the bitmaps for albums are stored in SD card under ssbamps directory
 	String path = "/ssbmaps/";
 	String ind = "";
 
@@ -93,7 +106,7 @@ void SelectScreen::drawAlbum(uint8_t index){
 	}
 
 	path = path + ind + String(".bmp");
-	
+
 	// convert the path to charArray
 	char charBuffer[path.length() + 1];
 	path.toCharArray(charBuffer, path.length() + 1);
@@ -101,8 +114,8 @@ void SelectScreen::drawAlbum(uint8_t index){
 	bmpDraw(charBuffer, this->tft, album_x, album_y);
 }
 
-// code to transition to new screen (scroll left or right for more options)
-// on clicks registered at sides
+// code to transition to new screen on clicks registered at sides
+// sets new albums and sets current index to first song on the list
 void SelectScreen::setAlbums(uint8_t maxIndex){
 
 	// limit it to global max and bottom end to 5
@@ -125,30 +138,32 @@ void SelectScreen::setAlbums(uint8_t maxIndex){
 	}
 }
 
+// return current index, is 1 less than music file it correspinds to
 uint8_t SelectScreen::getIndex(){
 	return this->current_ind;
 }
 
-// setting index involves changing current index, redrawing selection rectangles
-// (old and new ones) and then getting information from mp3 tags and calling
-// setters. On second click on same index, transition (to PlayScreen) code is called
+// change current index, set selection rectangles around old and new
+// selections and set new music information from mp3 tags
 void SelectScreen::setIndex(uint8_t index){
 
-	// set old album x and y (to get rectangle origin) and draw white rectangle around
-	// old selection
-	uint16_t oalbum_x = SS_SWITCH_WIDTH + SS_MARGIN_LR + ((this->current_ind % 6)/2)*(SS_ALBUM_WIDTH + SS_MARGIN_COL) - 2;
-	uint16_t oalbum_y = SS_MARGIN_TB - 2;
+	// set old album (album) x and y (to get rectangle origin) and draw white
+	// rectangle around old selection
+	uint16_t album_x = SS_SWITCH_WIDTH + SS_MARGIN_LR + ((this->current_ind % 6)/2) \
+			*(SS_ALBUM_WIDTH + SS_MARGIN_COL) - 2;
+	uint16_t album_y = SS_MARGIN_TB - 2;
 
 	if ((this->current_ind % 2) != 0){
-		oalbum_y = oalbum_y + SS_MARGIN_ROW + SS_ALBUM_HEIGHT;
+		album_y = album_y + SS_MARGIN_ROW + SS_ALBUM_HEIGHT;
 	}
 
-	this->tft->drawRect(oalbum_x, oalbum_y, SS_ALBUM_WIDTH + 4, SS_ALBUM_HEIGHT + 4, SS_WHITE);
+	this->tft->drawRect(album_x, album_y, SS_ALBUM_WIDTH + 4, SS_ALBUM_HEIGHT + 4, SS_WHITE);
 
-	// do the something except with the new selection and red rectangle
+	// set red selection rectangle around new album
 	this->current_ind = index;
-	uint16_t album_x = SS_SWITCH_WIDTH + SS_MARGIN_LR + ((this->current_ind % 6)/2)*(SS_ALBUM_WIDTH + SS_MARGIN_COL) - 2;
-	uint16_t album_y = SS_MARGIN_TB - 2;
+	album_x = SS_SWITCH_WIDTH + SS_MARGIN_LR + ((this->current_ind % 6)/2) \
+			*(SS_ALBUM_WIDTH + SS_MARGIN_COL) - 2;
+	album_y = SS_MARGIN_TB - 2;
 
 	if ((this->current_ind % 2) != 0){
 		album_y = album_y + SS_MARGIN_ROW + SS_ALBUM_HEIGHT;

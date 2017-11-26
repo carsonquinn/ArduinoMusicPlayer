@@ -23,52 +23,53 @@ Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 DFRobotDFPlayerMini music_player;
 
 void setup(){
-  init();
+	init();
 
-  // DF Mini communicates over serial1
-  Serial.begin(9600);
-  Serial1.begin(9600);
+	// DF Mini communicates over serial1
+	Serial.begin(9600);
+	Serial1.begin(9600);
 
-  // music player setup
-  if (!music_player.begin(Serial1)) {  //Use softwareSerial to communicate with mp3.
-    Serial.println("DFPlayer Fail");
-    while(true) { };
-  }
-  Serial.println("DFPlayer online");
-  music_player.volume(30);
-  music_player.play(2);
+	// music player setup
+	if (!music_player.begin(Serial1)) {  //Use softwareSerial to communicate with mp3.
+		Serial.println("DFPlayer Fail");
+	while(true) { };
+	}
 
-  // must come before SD.begin() ...
-  tft.begin();
-  tft.setRotation(3);
-  tft.fillScreen(0xFFFF);
+	Serial.println("DFPlayer online");
+	music_player.volume(30);
 
-  Serial.print("Initializing SD card...");
+	// must come before SD.begin() ...
+	tft.begin();
+	tft.setRotation(3);
+	tft.fillScreen(0xFFFF);
 
-  // TFT SD initialization
-  if (!SD.begin(TFT_SDCS)) {
-    Serial.println("SD fail");
-    while (true) { };
-  } else {
-    Serial.println("Initialized");
-  }
+	Serial.print("Initializing SD card...");
+
+	// TFT SD initialization
+	if (!SD.begin(TFT_SDCS)) {
+		Serial.println("SD fail");
+	while (true) { };
+	} else {
+		Serial.println("Initialized");
+	}
 
 }
 
 int main(){
-  setup();
+	setup();
 
-  enum State {SELECT_SCREEN, SELECT_TO_PLAY, PLAY, PLAY_TO_SELECT};
-	State state = SELECT_SCREEN;
-  Serial.println(music_player.readFileCounts()/2);
-  SelectScreen ss = SelectScreen(&tft, music_player.readFileCounts()/2);
+  	enum State {SELECT_SCREEN, SELECT_TO_PLAY, PLAY, PLAY_TO_SELECT};
+  	State state = SELECT_SCREEN;
 
-  music_player.play(5);
+  	SelectScreen ss = SelectScreen(&tft, music_player.readFileCounts()/2);
 
-  while(true){
-    delay(500);
-    //Serial.println('WORKD');
-  }
+  	music_player.play(5);
 
-  return 0;
+  	while(true){
+		if (state == SELECT_SCREEN){
+
+		}
+  	}
+
+  	return 0;
 }
