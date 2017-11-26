@@ -60,8 +60,8 @@ int main(){
 
   enum State {SELECT_SCREEN, SELECT_TO_PLAY, PLAY, PLAY_TO_SELECT};
 	State state = SELECT_SCREEN;
-
-  SelectScreen ss = SelectScreen(&tft);
+  Serial.println(music_player.readFileCounts()/2);
+  SelectScreen ss = SelectScreen(&tft, music_player.readFileCounts()/2);
 
   music_player.play(5);
 

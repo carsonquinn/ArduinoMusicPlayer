@@ -7,8 +7,8 @@
 #ifndef _BMP_DISP_H
 #define _BMP_DISP_H
 
- // uint32_t read32(File &f);
- // uint16_t read16(File &f);
- void bmpDraw(char *filename, Adafruit_ILI9341 *tft, int16_t x, int16_t y);
+// file read functions don't need to declared here,
+// they're used in the cpp file anyway
+void bmpDraw(char *filename, Adafruit_ILI9341 *tft, int16_t x, int16_t y);
 
  #endif
