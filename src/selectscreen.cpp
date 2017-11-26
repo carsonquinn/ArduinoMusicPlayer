@@ -22,6 +22,10 @@
 			15 pixel as margin on top and bottom
 			20 pixels between the two rows
 
+		Note: 10 pixels is larger than I expected so you should decrease the
+		margins by a bit. Required me to resize all my bitmaps and was too
+		lazy for that.
+
 	The rectangle around selected item will start and end 2x2 pixels from album art
 */
 
@@ -61,12 +65,14 @@ SelectScreen::SelectScreen(Adafruit_ILI9341* tft, uint8_t max_ind){
 	// -1 since the class is 0 indexed but the songs and album art titles start from 1
 	this->max_ind = max_ind - 1;
 	this->current_max = 0;
+	// current_ind lies between 0 to numSongs - 1
 	this->current_ind = 0;
 	this->title = "";
 	this->artist = "";
 	this->album = "";
 
 	// initialization for on screen elements is carried in constructor
+	tft->fillScreen(SS_WHITE);
 	tft->drawRect(SS_SWITCH_WIDTH, SS_HEIGHT - SS_TEXT_BOX, SS_WIDTH - \
 			2*SS_SWITCH_WIDTH, SS_TEXT_BOX - 1, SS_RED);
 	tft->fillTriangle(0, SS_HEIGHT/2, (SS_SWITCH_WIDTH + SS_MARGIN_LR/2),\
@@ -116,7 +122,7 @@ void SelectScreen::drawAlbum(uint8_t index){
 
 // code to transition to new screen on clicks registered at sides
 // sets new albums and sets current index to first song on the list
-void SelectScreen::setAlbums(uint8_t maxIndex){
+void SelectScreen::setAlbums(int maxIndex){
 
 	// limit it to global max and bottom end to 5
 	if (maxIndex > this->max_ind){
@@ -132,6 +138,22 @@ void SelectScreen::setAlbums(uint8_t maxIndex){
 
 		for(int i = lowIndex; i<=maxIndex; i++){
 			this->drawAlbum(i);
+		}
+
+		// in case albums don't fill screen in an extreme case
+		if (maxIndex - lowIndex != 5){
+			for(int i = maxIndex + 1; (i - lowIndex) <=5; i++){
+				// set empty rectangles x and y
+				uint16_t rect_x = SS_SWITCH_WIDTH + SS_MARGIN_LR + ((i% 6)/2)\
+						*(SS_ALBUM_WIDTH + SS_MARGIN_COL);
+				uint16_t rect_y = SS_MARGIN_TB;
+
+				if ((i % 2) != 0){
+					rect_y = rect_y + SS_MARGIN_ROW + SS_ALBUM_HEIGHT;
+				}
+				this->tft->fillRect(rect_x, rect_y, SS_ALBUM_WIDTH,\
+					 	SS_ALBUM_HEIGHT, SS_WHITE);
+			}
 		}
 
 		this->setIndex(lowIndex);
@@ -171,3 +193,48 @@ void SelectScreen::setIndex(uint8_t index){
 
 	this->tft->drawRect(album_x, album_y, SS_ALBUM_WIDTH + 4, SS_ALBUM_HEIGHT + 4, SS_RED);
 }
+
+// handles touch event and returns true if screen needs to move from
+// select to play
+bool SelectScreen::handleTouch(uint16_t tx, uint16_t ty){
+	// the extremeties are handled inside setAlbums
+	if (tx < (SS_SWITCH_WIDTH + SS_MARGIN_LR)){
+		int callIndex = this->current_max - (this->current_max % 6) - 1;
+		this->setAlbums(callIndex);
+		return false;
+	} else if (tx > SS_WIDTH - (SS_SWITCH_WIDTH + SS_MARGIN_LR)){
+		// the higher than expected extreme would be handles inside setAlbums
+		int callIndex = this->current_max + 6;
+		this->setAlbums(callIndex);
+		return false;
+	} else if (ty < SS_HEIGHT - SS_TEXT_BOX){
+		// get index of album if an album was touched
+		uint8_t touchedIndex = this->handleAlbumTouch(tx, ty);
+		if (touchedIndex == this->current_ind){
+			return true;
+		}else if (touchedIndex <= this->max_ind){
+			this->setIndex(touchedIndex);
+			// small delay prevents multi-touch
+			delay(500);
+			return false;
+		}else{
+			return false;
+		}
+	}
+}
+
+uint8_t SelectScreen::handleAlbumTouch(uint16_t tx, uint16_t ty){
+	uint8_t index = this->current_max - (this->current_max % 6);
+	// increase index by 1 if it's in bottom row
+	if (ty > SS_MARGIN_TB + SS_ALBUM_HEIGHT + SS_MARGIN_ROW/2){
+		index += 1;
+	}
+	tx = tx - SS_SWITCH_WIDTH - SS_MARGIN_LR;
+	if (tx > SS_ALBUM_WIDTH + SS_MARGIN_COL/2){
+		index += 2;
+	}
+	if (tx > 2*SS_ALBUM_WIDTH + SS_MARGIN_COL*(3/2)){
+		index += 2;
+	}
+	return index;
+};

@@ -4,7 +4,6 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_ILI9341.h>
 #include <DFRobotDFPlayerMini.h>
-#include "bmp_disp.h"
 #include "playscreen.h"
 #include "selectscreen.h"
 #include "touch.h"
@@ -61,13 +60,30 @@ int main(){
   	enum State {SELECT_SCREEN, SELECT_TO_PLAY, PLAY, PLAY_TO_SELECT};
   	State state = SELECT_SCREEN;
 
+	// main objects for the screens and touch handler
+	// only SelectScreen is initialized since that's the first screen user
+	// would see.
   	SelectScreen ss = SelectScreen(&tft, music_player.readFileCounts()/2);
+	Touch touch = Touch();
 
   	music_player.play(5);
 
   	while(true){
 		if (state == SELECT_SCREEN){
-
+			// get touch, if button is released, handle touch
+			touch.processTouch();
+			bool move = false;
+			if (touch.isButtonUp()){
+				move = ss.handleTouch(touch.getX(), touch.getY());
+			}
+			// the touch handler for class returns true if state change
+			// action has been processed
+			if (move){
+				state = SELECT_TO_PLAY;
+			}
+		}else if (state == SELECT_TO_PLAY){
+			Serial.print("here");
+			delay(500);
 		}
   	}
 

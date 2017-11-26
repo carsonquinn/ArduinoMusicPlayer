@@ -29,18 +29,19 @@
 
 TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
 
+// this constructor sets it to the default state
 Touch::Touch(){
-	// this constructor sets it to the default state
 	this->state = NO_TOUCH;
 }
 
+// set state and touch location according to action
 void Touch::processTouch(){
 
 	TSPoint p = ts.getPoint();
 
 	if (p.z < MINPRESSURE || p.z > MAXPRESSURE) {
 		// this is called when the user is not touching the screen
-			if(this->state == B_DOWN){
+			if (this->state == B_DOWN){
 				this->state = B_UP;
 			}else if(this->state == B_UP){
 				this->state = NO_TOUCH;
@@ -51,11 +52,11 @@ void Touch::processTouch(){
 			// exit loop if there is no touch
 	}
 
-	if(this->state == NO_TOUCH){
+	if (this->state == NO_TOUCH){
 		this->state = B_DOWN;
-	}else if(this->state == B_DOWN){
+	}else if (this->state == B_DOWN){
 		this->state = PRESSED;
-	}else if(this->state == B_UP){
+	}else if (this->state == B_UP){
 		this->state = B_DOWN;
 	}
 
@@ -69,18 +70,18 @@ void Touch::processTouch(){
 	this->ty = p.x;
 }
 
+// whether or not the touchscreen is being constantly being held
 bool Touch::isPressed(){
-	// whether or not the touchscreen is being constantly being held. Will repeat
 	return this->state == PRESSED;
 }
 
+// whether or not the touchscreen was just touched.
 bool Touch::isButtonDown(){
-	// whether or not the touchscreen was just touched. Will not repeat
 	return this->state == B_DOWN;
 }
 
+// whether or not the touchscreen was just released. Will not repeat
 bool Touch::isButtonUp(){
-	// whether or not the touchscreen was just released. Will not repeat
 	return this->state == B_UP;
 }
 

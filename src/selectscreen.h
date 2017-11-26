@@ -19,7 +19,7 @@ public:
 	// they handle changing index fields for the object since that's the only
 	// time we need to handle that
 	void drawAlbum(uint8_t index);
-	void setAlbums(uint8_t maxIndex);
+	void setAlbums(int maxIndex);
 
 	uint8_t getIndex();
 	void setIndex(uint8_t index);
@@ -32,6 +32,9 @@ public:
 
 	String getAlbum(uint8_t index);
 	void setAlbum(String title);
+
+	bool handleTouch(uint16_t tx, uint16_t ty);
+	uint8_t handleAlbumTouch(uint16_t tx, uint16_t ty);
 
 };
 #endif
