@@ -94,7 +94,6 @@ SelectScreen::SelectScreen(Adafruit_ILI9341* tft, uint8_t max_ind){
 			(SS_SWITCH_WIDTH + SS_MARGIN_LR)/2, SS_LIGHTGREY);
 
 	this->setAlbums(this->current_max + 5);
-	this->setIndex(this->current_ind);
 }
 
 // empty initialization to make a global (main) variable
@@ -245,6 +244,10 @@ void SelectScreen::setInfo(uint8_t index){
 			this->artist = f_variable;
 		}else if(f_setter == "album"){
 			this->album = f_variable;
+		}else if(f_setter == "time"){
+			char buffer[f_variable.length()];
+			f_variable.toCharArray(buffer, f_variable.length());
+			this->song_len = atof(buffer);
 		}
 	}
 }

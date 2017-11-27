@@ -11,6 +11,7 @@ private:
 	String title;
 	String artist;
 	String album;
+	float song_len;
 
 public:
 	SelectScreen(Adafruit_ILI9341* tft, uint8_t max_ind);
