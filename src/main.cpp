@@ -54,6 +54,7 @@ void setup(){
 
 }
 
+
 int main(){
 	setup();
 
@@ -66,9 +67,10 @@ int main(){
   	SelectScreen ss = SelectScreen(&tft, music_player.readFileCounts()/2);
 	Touch touch = Touch();
 
-  	music_player.play(5);
+  	music_player.play(37);
 
   	while(true){
+		// code to run Select Screen
 		if (state == SELECT_SCREEN){
 			// get touch, if button is released, handle touch
 			touch.processTouch();
@@ -81,7 +83,9 @@ int main(){
 			if (move){
 				state = SELECT_TO_PLAY;
 			}
-		}else if (state == SELECT_TO_PLAY){
+
+		// code to transition to Play Screen
+		} else if (state == SELECT_TO_PLAY){
 			Serial.print("here");
 			delay(500);
 		}

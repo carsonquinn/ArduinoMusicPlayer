@@ -33,6 +33,8 @@ public:
 	String getAlbum(uint8_t index);
 	void setAlbum(String title);
 
+	void setInfo(uint8_t index);
+
 	bool handleTouch(uint16_t tx, uint16_t ty);
 	uint8_t handleAlbumTouch(uint16_t tx, uint16_t ty);
 

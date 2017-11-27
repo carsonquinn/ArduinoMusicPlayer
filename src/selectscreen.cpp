@@ -31,6 +31,8 @@
 
 #include <Adafruit_GFX.h>    // Core graphics library
 #include <Adafruit_ILI9341.h> // Hardware-specific library
+#include <SPI.h>
+#include <SD.h>
 #include "bmp_disp.h"	// To draw album art
 #include "selectscreen.h"
 
@@ -155,7 +157,7 @@ void SelectScreen::setAlbums(int maxIndex){
 					 	SS_ALBUM_HEIGHT, SS_WHITE);
 			}
 		}
-
+		
 		this->setIndex(lowIndex);
 	}
 }
@@ -192,6 +194,54 @@ void SelectScreen::setIndex(uint8_t index){
 	}
 
 	this->tft->drawRect(album_x, album_y, SS_ALBUM_WIDTH + 4, SS_ALBUM_HEIGHT + 4, SS_RED);
+	this->setInfo(index);
+}
+
+// set info fields
+void SelectScreen::setInfo(uint8_t index){
+	String path = "/texts/";
+	String ind = "";
+
+	if (index < 9){
+		ind = String("000") + String(index+1);
+	}else{
+		ind = String("00") + String(index+1);
+	}
+
+	path = path + ind + String(".txt");
+
+	// convert the path to charArray
+	char charBuffer[path.length() + 1];
+	path.toCharArray(charBuffer, path.length() + 1);
+
+	File f = SD.open(charBuffer);
+
+	while(f.available() > 0){
+		// set data from file
+		String f_line = f.readStringUntil('\r');
+		int f_break = f_line.indexOf(":");
+		String f_setter = f_line.substring(0,f_break);
+		String f_variable = f_line.substring(f_break + 1);
+
+		// set field variables accordingly
+		if(f_setter == "song"){
+			this->title = f_variable;
+		}else if(f_setter == "artist"){
+			this->artist = f_variable;
+		}else if(f_setter == "album"){
+			this->album = f_variable;
+		}
+	}
+}
+
+// get title from the fields
+String SelectScreen::getTitle(uint8_t index){
+	return this->title;
+}
+
+// set title on the screen while handling text centering
+void SelectScreen::setTitle(String title){
+
 }
 
 // handles touch event and returns true if screen needs to move from
