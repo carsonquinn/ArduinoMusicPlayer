@@ -6,6 +6,7 @@
 #include <DFRobotDFPlayerMini.h>
 #include "playscreen.h"
 #include "selectscreen.h"
+#include "boot.h"
 #include "touch.h"
 
 // TFT SD includes all the image files for
@@ -58,20 +59,31 @@ void setup(){
 int main(){
 	setup();
 
-  	enum State {SELECT_SCREEN, SELECT_TO_PLAY, PLAY, PLAY_TO_SELECT};
-  	State state = SELECT_SCREEN;
+  	enum State {BOOT, SELECT_SCREEN, SELECT_TO_PLAY, PLAY, PLAY_TO_SELECT};
+  	State state = BOOT;
 
 	// main objects for the screens and touch handler
-	// only SelectScreen is initialized since that's the first screen user
-	// would see.
-  	SelectScreen ss = SelectScreen(&tft, music_player.readFileCounts()/2);
+	// only Boot Screen is Initialized here, the rest are empty Initialized
+	SelectScreen ss = SelectScreen(&tft);
+	Boot boot = Boot(&tft);
 	Touch touch = Touch();
 
   	music_player.play(37);
 
   	while(true){
+		// code for Boot screen
+		if (state == BOOT){
+			touch.processTouch();
+			boot.animate(millis());
+			// change state on click anywhere on screen
+			if (touch.isButtonUp()){
+				state = SELECT_SCREEN;
+				ss = SelectScreen(&tft, music_player.readFileCounts()/2);
+			}
+		}
+
 		// code to run Select Screen
-		if (state == SELECT_SCREEN){
+		else if (state == SELECT_SCREEN){
 			// get touch, if button is released, handle touch
 			touch.processTouch();
 			bool move = false;
@@ -86,7 +98,7 @@ int main(){
 
 		// code to transition to Play Screen
 		} else if (state == SELECT_TO_PLAY){
-			
+
 		}
   	}
 

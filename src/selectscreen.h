@@ -14,6 +14,7 @@ private:
 
 public:
 	SelectScreen(Adafruit_ILI9341* tft, uint8_t max_ind);
+	SelectScreen(Adafruit_ILI9341* tft);
 
 	// drawAlbum and SetAlbums are called on touch events and hence
 	// they handle changing index fields for the object since that's the only

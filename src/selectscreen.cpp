@@ -97,6 +97,11 @@ SelectScreen::SelectScreen(Adafruit_ILI9341* tft, uint8_t max_ind){
 	this->setIndex(this->current_ind);
 }
 
+// empty initialization to make a global (main) variable
+SelectScreen::SelectScreen(Adafruit_ILI9341* tft){
+	this->tft = tft;
+}
+
 // draw album art corresponding to index, handles getting and drawing album art
 // when set albums is called
 void SelectScreen::drawAlbum(uint8_t index){
