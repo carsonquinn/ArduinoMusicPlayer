@@ -25,13 +25,13 @@ public:
 	void setIndex(uint8_t index);
 
 	String getTitle(uint8_t index);
-	void setTitle(String title);
+	void printTitle(String title);
 
 	String getArtist(uint8_t index);
-	void setArtist(String title);
+	void printArtist(String title);
 
 	String getAlbum(uint8_t index);
-	void setAlbum(String title);
+	void printAlbum(String title);
 
 	void setInfo(uint8_t index);
 

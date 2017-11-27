@@ -53,7 +53,14 @@
 #define SS_MARGIN_ROW 20
 
 #define SS_TEXT_BOX 50
+
 #define SS_TEXT_CENTER 160
+#define SS_TITLE_Y 192
+#define SS_ARTIST_Y 212
+#define SS_ALBUM_Y 224
+
+#define SS_TEXT2_MAX 22
+#define SS_TEXT1_MAX 44
 
 #define SS_ALBUM_HEIGHT 70
 #define SS_ALBUM_WIDTH 70
@@ -157,7 +164,7 @@ void SelectScreen::setAlbums(int maxIndex){
 					 	SS_ALBUM_HEIGHT, SS_WHITE);
 			}
 		}
-		
+
 		this->setIndex(lowIndex);
 	}
 }
@@ -195,6 +202,9 @@ void SelectScreen::setIndex(uint8_t index){
 
 	this->tft->drawRect(album_x, album_y, SS_ALBUM_WIDTH + 4, SS_ALBUM_HEIGHT + 4, SS_RED);
 	this->setInfo(index);
+	this->printTitle(this->title);
+	this->printArtist(this->artist);
+	this->printAlbum(this->album);
 }
 
 // set info fields
@@ -218,7 +228,7 @@ void SelectScreen::setInfo(uint8_t index){
 
 	while(f.available() > 0){
 		// set data from file
-		String f_line = f.readStringUntil('\r');
+		String f_line = f.readStringUntil('\n');
 		int f_break = f_line.indexOf(":");
 		String f_setter = f_line.substring(0,f_break);
 		String f_variable = f_line.substring(f_break + 1);
@@ -240,8 +250,50 @@ String SelectScreen::getTitle(uint8_t index){
 }
 
 // set title on the screen while handling text centering
-void SelectScreen::setTitle(String title){
+void SelectScreen::printTitle(String title){
+	this->tft->fillRect(SS_SWITCH_WIDTH, SS_HEIGHT - SS_TEXT_BOX, SS_WIDTH - \
+			2*SS_SWITCH_WIDTH, SS_TEXT_BOX - 1, SS_WHITE);
+	this->tft->drawRect(SS_SWITCH_WIDTH, SS_HEIGHT - SS_TEXT_BOX, SS_WIDTH - \
+			2*SS_SWITCH_WIDTH, SS_TEXT_BOX - 1, SS_RED);
+	this->tft->setTextColor(SS_RED);
+	this->tft->setTextSize(2);
+	if (title.length() > SS_TEXT2_MAX){
+		title = title.substring(0, SS_TEXT2_MAX - 3) + String("...");
+	}
+	this->tft->setCursor(SS_TEXT_CENTER - (title.length()/2)*12, SS_TITLE_Y);
+	this->tft->print(title);
+}
 
+// get artist from the fields
+String SelectScreen::getArtist(uint8_t index){
+	return this->artist;
+}
+
+// set artist on the screen
+void SelectScreen::printArtist(String title){
+	this->tft->setTextColor(SS_RED);
+	this->tft->setTextSize(1);
+	if (title.length()>SS_TEXT1_MAX){
+		title = title.substring(0,SS_TEXT1_MAX-3) + String("...");
+	}
+	this->tft->setCursor(SS_TEXT_CENTER - (title.length()/2)*6, SS_ARTIST_Y);
+	this->tft->print(title);
+}
+
+// get album from the fields
+String SelectScreen::getAlbum(uint8_t index){
+	return this->album;
+}
+
+// set album on the screen
+void SelectScreen::printAlbum(String title){
+	this->tft->setTextColor(SS_RED);
+	this->tft->setTextSize(1);
+	if (title.length()>SS_TEXT1_MAX){
+		title = title.substring(0,SS_TEXT1_MAX-3) + String("...");
+	}
+	this->tft->setCursor(SS_TEXT_CENTER - (title.length()/2)*6, SS_ALBUM_Y);
+	this->tft->print(title);
 }
 
 // handles touch event and returns true if screen needs to move from
