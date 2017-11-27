@@ -86,8 +86,7 @@ int main(){
 
 		// code to transition to Play Screen
 		} else if (state == SELECT_TO_PLAY){
-			Serial.print("here");
-			delay(500);
+			
 		}
   	}
 
