@@ -76,14 +76,14 @@
 #define ICON_ZY 15 // MARGIN_TB
 
 // adafruit_ILI9341 *tft;
-SelectScreen::SelectScreen(Adafruit_ILI9341* tft, uint32_t max_ind){
+SelectScreen::SelectScreen(Adafruit_ILI9341* tft, uint32_t maxIndex){
 
 	this->tft = tft;
 	// -1 since the class is 0 indexed but the songs and album art titles start from 1
 	// we pass the number of songs in sd card as an argument to select screen
-	this->max_ind = max_ind - 1;
-	this->current_max = 0;
-	this->current_ind = 0;
+	this->maxIndex = maxIndex - 1;
+	this->currentMax = 0;
+	this->index = 0;
 
 	this->title = "";
 	this->artist = "";
@@ -94,7 +94,7 @@ SelectScreen::SelectScreen(Adafruit_ILI9341* tft, uint32_t max_ind){
 	tft->fillTriangle(0, SCREEN_H/2, TRI_H, TRI_Y1, TRI_H, TRI_Y2, GREY);
 	tft->fillTriangle(SCREEN_W, SCREEN_H/2, TRI_RX, TRI_Y1, TRI_RX, TRI_Y2, GREY);
 
-	this->setAlbums(this->current_max + 5);
+	this->setAlbums(this->currentMax + 5);
 }
 
 // empty initialization to make a global (main) variable
@@ -138,15 +138,15 @@ void SelectScreen::drawAlbum(uint32_t index){
 void SelectScreen::setAlbums(int maxIndex){
 
 	// limit it to global max and bottom end to 5
-	if (maxIndex > (int)this->max_ind){
-		maxIndex = this->max_ind;
+	if (maxIndex > (int)this->maxIndex){
+		maxIndex = this->maxIndex;
 	} else if (maxIndex < 0){
 		maxIndex = 5;
 	}
 
 	// don't change screen on extremeties
-	if(!(maxIndex == (int)this->current_max)){
-		this->current_max = maxIndex;
+	if(!(maxIndex == (int)this->currentMax)){
+		this->currentMax = maxIndex;
 		uint8_t lowIndex = maxIndex - (maxIndex % 6);
 
 		for(int i = lowIndex; i <= maxIndex; i++){
@@ -157,13 +157,13 @@ void SelectScreen::setAlbums(int maxIndex){
 		if (maxIndex - lowIndex != 5){
 			for (int i = maxIndex + 1; (i - lowIndex) <= 5; i++){
 				// set empty rectangles to replace current album art
-				uint16_t rect_x = ICON_ZX + ((i % 6)/2)*(ICON_W + MARGIN_COL);
-				uint16_t rect_y = ICON_ZY;
+				uint16_t rectX = ICON_ZX + ((i % 6)/2)*(ICON_W + MARGIN_COL);
+				uint16_t rectY = ICON_ZY;
 
 				if ((i % 2) != 0){
-					rect_y = rect_y + MARGIN_ROW + ICON_H;
+					rectY = rectY + MARGIN_ROW + ICON_H;
 				}
-				this->tft->fillRect(rect_x, rect_y, ICON_W, ICON_H, WHITE);
+				this->tft->fillRect(rectX, rectY, ICON_W, ICON_H, WHITE);
 			}
 		}
 		this->setIndex(lowIndex);
@@ -172,7 +172,7 @@ void SelectScreen::setAlbums(int maxIndex){
 
 // return current index, is 1 less than music file it correspinds to
 uint8_t SelectScreen::getIndex(){
-	return this->current_ind;
+	return this->index;
 }
 
 // change current index, set selection rectangles around old and new
@@ -181,21 +181,21 @@ void SelectScreen::setIndex(uint32_t index){
 
 	// set old album (album) x and y (to get rectangle origin) and draw white
 	// rectangle around old selection
-	uint16_t iconX = ICON_ZX + ((this->current_ind % 6)/2)*(ICON_W + MARGIN_COL) - 2;
+	uint16_t iconX = ICON_ZX + ((this->index % 6)/2)*(ICON_W + MARGIN_COL) - 2;
 	uint16_t iconY = ICON_ZY - 2;
 
-	if ((this->current_ind % 2) != 0){
+	if ((this->index % 2) != 0){
 		iconY += MARGIN_ROW + ICON_H;
 	}
 
 	this->tft->drawRect(iconX, iconY, ICON_W + 4, ICON_H + 4, WHITE);
 
 	// set red selection rectangle around new album
-	this->current_ind = index;
-	iconX = ICON_ZX + ((this->current_ind % 6)/2)*(ICON_W + MARGIN_COL) - 2;
+	this->index = index;
+	iconX = ICON_ZX + ((this->index % 6)/2)*(ICON_W + MARGIN_COL) - 2;
 	iconY = ICON_ZY - 2;
 
-	if ((this->current_ind % 2) != 0){
+	if ((this->index % 2) != 0){
 		iconY += MARGIN_ROW + ICON_H;
 	}
 
@@ -242,7 +242,7 @@ void SelectScreen::setInfo(uint32_t index){
 		}else if(f_setter == "time"){
 			char buffer[f_variable.length()];
 			f_variable.toCharArray(buffer, f_variable.length());
-			this->song_len = atof(buffer);
+			this->songLen = atof(buffer);
 		}
 	}
 }
@@ -303,20 +303,20 @@ void SelectScreen::printAlbum(String title){
 bool SelectScreen::handleTouch(uint16_t tx, uint16_t ty){
 	// the extremeties are handled inside setAlbums
 	if (tx < (ICON_ZX)){
-		int callIndex = this->current_max - (this->current_max % 6) - 1;
+		int callIndex = this->currentMax - (this->currentMax % 6) - 1;
 		this->setAlbums(callIndex);
 		return false;
 	} else if (tx > SCREEN_W - (ICON_ZX)){
 		// the higher than expected extreme would be handles inside setAlbums
-		int callIndex = this->current_max + 6;
+		int callIndex = this->currentMax + 6;
 		this->setAlbums(callIndex);
 		return false;
 	} else if (ty < SCREEN_H - TEXTBOX_H){
 		// get index of album if an album was touched
 		uint8_t touchedIndex = this->handleAlbumTouch(tx, ty);
-		if (touchedIndex == this->current_ind){
+		if (touchedIndex == this->index){
 			return true;
-		}else if (touchedIndex <= this->max_ind){
+		}else if (touchedIndex <= this->maxIndex){
 			this->setIndex(touchedIndex);
 			// small delay prevents multi-touch
 			delay(500);
@@ -328,7 +328,7 @@ bool SelectScreen::handleTouch(uint16_t tx, uint16_t ty){
 }
 
 uint8_t SelectScreen::handleAlbumTouch(uint16_t tx, uint16_t ty){
-	uint8_t index = this->current_max - (this->current_max % 6);
+	uint8_t index = this->currentMax - (this->currentMax % 6);
 	// increase index by 1 if it's in bottom row
 	if (ty > MARGIN_TB + ICON_H + MARGIN_ROW/2){
 		index += 1;

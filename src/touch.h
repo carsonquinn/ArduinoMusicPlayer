@@ -4,7 +4,8 @@
 class Touch{
 
 private:
-	int tx,ty,state;
+	uint16_t tx,ty;
+	int state;
 
 public:
 	Touch();
@@ -13,7 +14,7 @@ public:
 	bool isPressed();
 	bool isButtonDown();
 	bool isButtonUp();
-	
+
 	int getX();
 	int getY();
 };

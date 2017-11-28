@@ -5,12 +5,20 @@ class PlayScreen{
 
 private:
 	Adafruit_ILI9341* tft;
+	DFRobotDFPlayerMini* musicPlayer;
 
-	//state of the play button
-	bool isPlaying,isLooping;
+	// state of the buttons
+	bool isPlaying, isLooping;
 
+	// music variables
 	uint8_t volume;
+
+	// song variables
 	uint32_t index;
+	String title;
+	String artist;
+	String album;
+	float songLen;
 
 	//time since the volume has changed
 	int delay;
@@ -34,8 +42,9 @@ private:
 
 public:
  	PlayScreen(Adafruit_ILI9341* tft);
-	
-	void handleTouch(Touch* touch);
+	PlayScreen(Adafruit_ILI9341* tft, DFRobotDFPlayerMini* musicPlayer);
+
+	void handleTouch(uint16_t tx, uint16_t ty, int state);
 
 };
 #endif

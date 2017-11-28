@@ -20,7 +20,7 @@
 #define TH_WIDTH 320
 #define TH_HEIGHT 240
 
-// the state of the screen will always be one of the following
+// the state of the touch will always be one of the following
 // changes will be made on button up (B_UP) only
 #define NO_TOUCH 0
 #define B_DOWN 1

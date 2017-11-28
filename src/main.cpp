@@ -4,7 +4,7 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_ILI9341.h>
 #include <DFRobotDFPlayerMini.h>
-// #include "playscreen.h"
+#include "playscreen.h"
 #include "selectscreen.h"
 #include "boot.h"
 #include "touch.h"
@@ -20,7 +20,7 @@
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 
 // Initialize music DFRobotDFPlayerMini music player
-DFRobotDFPlayerMini music_player;
+DFRobotDFPlayerMini musicPlayer;
 
 void setup(){
 	init();
@@ -30,13 +30,13 @@ void setup(){
 	Serial1.begin(9600);
 
 	// music player setup
-	if (!music_player.begin(Serial1)) {
+	if (!musicPlayer.begin(Serial1)) {
 		Serial.println("DFPlayer Fail");
 	while(true) { };
 	}
 
 	Serial.println("DFPlayer online");
-	music_player.volume(30);
+	musicPlayer.volume(30);
 
 	// must come before SD.begin() ...
 	tft.begin();
@@ -66,9 +66,10 @@ int main(){
 	// only Boot Screen is Initialized here, the rest are empty Initialized
 	SelectScreen ss = SelectScreen(&tft);
 	Boot boot = Boot(&tft);
+	PlayScreen ps = PlayScreen(&tft);
 	Touch touch = Touch();
 
-  	music_player.play(11);
+  	musicPlayer.play(11);
 
   	while(true){
 		// code for Boot screen
@@ -78,7 +79,7 @@ int main(){
 			// change state on click anywhere on screen
 			if (touch.isButtonUp()){
 				state = SELECT_SCREEN;
-				ss = SelectScreen(&tft, music_player.readFileCounts()/2);
+				ss = SelectScreen(&tft, musicPlayer.readFileCounts()/2);
 			}
 		}
 
@@ -98,6 +99,11 @@ int main(){
 
 		// code to transition to Play Screen
 		} else if (state == SELECT_TO_PLAY){
+			ps = PlayScreen(&tft, &musicPlayer);
+			state = PLAY;
+
+		// run PlayScreen code
+		} else if (state == PLAY){
 
 		}
   	}

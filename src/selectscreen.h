@@ -5,13 +5,13 @@ class SelectScreen{
 
 private:
 	Adafruit_ILI9341* tft;
-	uint32_t max_ind;
-	uint32_t current_max;
-	uint32_t current_ind;
+	uint32_t maxIndex;
+	uint32_t currentMax;
+	uint32_t index;
 	String title;
 	String artist;
 	String album;
-	float song_len;
+	float songLen;
 
 	// drawAlbum and SetAlbums are called on touch events and hence
 	// they handle changing index fields for the object since that's the only
@@ -31,7 +31,7 @@ private:
 	uint8_t handleAlbumTouch(uint16_t tx, uint16_t ty);
 
 public:
-	SelectScreen(Adafruit_ILI9341* tft, uint32_t max_ind);
+	SelectScreen(Adafruit_ILI9341* tft, uint32_t maxIndex);
 	SelectScreen(Adafruit_ILI9341* tft);
 
 	String getTitle();

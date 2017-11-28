@@ -4,8 +4,8 @@
 
 #include <Adafruit_GFX.h>    // Core graphics library
 #include <Adafruit_ILI9341.h> // Hardware-specific library
+#include <DFRobotDFPlayerMini.h>
 #include "bmp_disp.h"
-#include "touch.h"
 #include "playscreen.h"
 
 
@@ -69,51 +69,64 @@
 // characters are 6x8 pixels.The following will change the scale
 #define TEXT_SCALE 2
 
+// the state of the touch will always be one of the following
+// changes will be made on button up (B_UP) only
+#define NO_TOUCH 0
+#define B_DOWN 1
+#define PRESSED 2
+#define B_UP 3
+
 // adafruit_ILI9341 *tft;
-PlayScreen::PlayScreen(Adafruit_ILI9341* tft){
+PlayScreen::PlayScreen(Adafruit_ILI9341* tft, DFRobotDFPlayerMini* musicPlayer){
 	this->tft = tft;
+	this->musicPlayer = musicPlayer;
 	this->isPlaying = true;
 	this->isLooping = false;
 	this->index = index;
 	this->delay = 0;
+	
 	this->draw();
+}
+
+PlayScreen::PlayScreen(Adafruit_ILI9341* tft){
+	this->tft = tft;
 }
 
 // this function takes in the x,y,value of the center of the button and the radius
 // also takes in the state which is pressed or not pressed
-void PlayScreen::handleTouch(Touch* touch){
+void PlayScreen::handleTouch(uint16_t tx, uint16_t ty, int state){
 	//only do something if touch was detected
-	if(touch->isButtonUp()){
+	if(state == B_UP){
 		//if the play button is touched, change the image of the button
-		if(isTouched(touch->getX(),touch->getY(),PB_X,PB_Y,PB_W,PB_H)){
+		if(isTouched(tx,ty,PB_X,PB_Y,PB_W,PB_H)){
 			onPlayClick();
 		}
 		//check if the looping button is pressed
-		if(isTouched(touch->getX(),touch->getY(),PS_LOOP_X,PS_LOOP_Y,PS_LOOP_W,PS_LOOP_H)){
+		else if(isTouched(tx,ty,PS_LOOP_X,PS_LOOP_Y,PS_LOOP_W,PS_LOOP_H)){
 			onLoopClick();
 		}
-		if(isTouched(touch->getX(),touch->getY(),PS_FORWARD_X,PS_FORWARD_Y,PS_FORWARD_W,PS_FORWARD_H)){
+		else if(isTouched(tx,ty,PS_FORWARD_X,PS_FORWARD_Y,PS_FORWARD_W,PS_FORWARD_H)){
 			onForwardClick();
 		}
-		if(isTouched(touch->getX(),touch->getY(),PS_REVERSE_X,PS_REVERSE_Y,PS_REVERSE_W,PS_REVERSE_H)){
+		else if(isTouched(tx,ty,PS_REVERSE_X,PS_REVERSE_Y,PS_REVERSE_W,PS_REVERSE_H)){
 			onReverseClick();
 		}
-		if(isTouched(touch->getX(),touch->getY(),ALBUM_PADDING_LEFT,ALBUM_PADDING_TOP,ALBUM_W,ALBUM_H)){
+		else if(isTouched(tx,ty,ALBUM_PADDING_LEFT,ALBUM_PADDING_TOP,ALBUM_W,ALBUM_H)){
 			onAlbumClick();
 		}
-		if(isTouched(touch->getX(),touch->getY(),0,PBAR_Y,PS_WIDTH,PBAR_H)){
-			onProgressBarClick((touch->getX())/(PS_WIDTH)*100);
+		else if(isTouched(tx,ty,0,PBAR_Y,PS_WIDTH,PBAR_H)){
+			onProgressBarClick((tx)/(PS_WIDTH)*100);
 		}
 
 
 	}
 	//for the volume button, we do not want to wait for the buttonUp event
 	//simply pressing the screen should change the volume
-	if(touch->isPressed()){
-		if(isTouched(touch->getX(),touch->getY(),PS_VOLUP_X,PS_VOLUP_Y,PS_VOL_W,PS_VOL_H)){
+	else if(state == PRESSED){
+		if(isTouched(tx,ty,PS_VOLUP_X,PS_VOLUP_Y,PS_VOL_W,PS_VOL_H)){
 			onVolUpClick();
 		}
-		if(isTouched(touch->getX(),touch->getY(),PS_VOLDOWN_X,PS_VOLDOWN_Y,PS_VOL_W,PS_VOL_H)){
+		if(isTouched(tx,ty,PS_VOLDOWN_X,PS_VOLDOWN_Y,PS_VOL_W,PS_VOL_H)){
 			onVolDownClick();
 		}
 	}
