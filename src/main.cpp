@@ -4,7 +4,7 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_ILI9341.h>
 #include <DFRobotDFPlayerMini.h>
-#include "playscreen.h"
+// #include "playscreen.h"
 #include "selectscreen.h"
 #include "boot.h"
 #include "touch.h"
@@ -30,7 +30,7 @@ void setup(){
 	Serial1.begin(9600);
 
 	// music player setup
-	if (!music_player.begin(Serial1)) {  //Use softwareSerial to communicate with mp3.
+	if (!music_player.begin(Serial1)) {
 		Serial.println("DFPlayer Fail");
 	while(true) { };
 	}
@@ -68,7 +68,7 @@ int main(){
 	Boot boot = Boot(&tft);
 	Touch touch = Touch();
 
-  	music_player.play(9);
+  	music_player.play(11);
 
   	while(true){
 		// code for Boot screen

@@ -8,10 +8,12 @@ private:
 
 public:
 	Touch();
+
 	void processTouch();
 	bool isPressed();
 	bool isButtonDown();
 	bool isButtonUp();
+	
 	int getX();
 	int getY();
 };

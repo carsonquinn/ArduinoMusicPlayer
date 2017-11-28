@@ -33,63 +33,66 @@
 #include <Adafruit_ILI9341.h> // Hardware-specific library
 #include <SPI.h>
 #include <SD.h>
-#include "bmp_disp.h"	// To draw album art
+#include "bmp_disp.h"
 #include "selectscreen.h"
 
-#define SS_BLACK 0x0000
-#define SS_BLUE 0xADDAE6
-#define SS_RED 0xF800
-#define SS_CYAN 0x07FF
-#define SS_MAGENTA 0xF81F
-#define SS_WHITE 0xFFFF
-#define SS_LIGHTGREY 0xC638
+#define BLACK 0x0000
+#define RED 0xF800
+#define WHITE 0xFFFF
+#define GREY 0xC638
 
-#define SS_WIDTH 320
-#define SS_HEIGHT 240
+#define SCREEN_W 320
+#define SCREEN_H 240
 
-#define SS_MARGIN_LR 10
-#define SS_MARGIN_TB 15
-#define SS_MARGIN_COL 15
-#define SS_MARGIN_ROW 20
+// margins at sides and top bottom
+#define MARGIN_LR 10
+#define MARGIN_TB 15
 
-#define SS_TEXT_BOX 50
+// margins between icon columns and row
+#define MARGIN_COL 15
+#define MARGIN_ROW 20
 
-#define SS_TEXT_CENTER 160
-#define SS_TITLE_Y 192
-#define SS_ARTIST_Y 212
-#define SS_ALBUM_Y 224
+#define TEXTBOX_H 50
+#define TEXT_MAX 44
 
-#define SS_TEXT2_MAX 22
-#define SS_TEXT1_MAX 44
+#define TITLE_Y 192
+#define ARTIST_Y 212
+#define ALBUM_Y 224
 
-#define SS_ALBUM_HEIGHT 70
-#define SS_ALBUM_WIDTH 70
+// Side switch icon points, Y1 and Y2 are for side points
+// the icons are triangles that make it look like arrows
+// Height is for the triangle (goes L->R), Triangle base is 40 pixels
+#define SIDE_W 30
+#define TRI_H 35
+#define TRI_B 40
+#define TRI_Y1 100 // SCREEN_H/2 - triangle base/2
+#define TRI_Y2 140 // SCREEN_H/2 + triangle base/2
+#define TRI_RX 285 // SCREEN_W - TRI_H (right side icon x)
 
-#define SS_SWITCH_WIDTH 30
+// Icon X and Y refer to 0th index (first on screen) icon
+#define ICON_H 70
+#define ICON_W 70
+#define ICON_ZX 40 // SIDE_W + MARGIN_LR
+#define ICON_ZY 15 // MARGIN_TB
 
 // adafruit_ILI9341 *tft;
 SelectScreen::SelectScreen(Adafruit_ILI9341* tft, uint32_t max_ind){
 
 	this->tft = tft;
 	// -1 since the class is 0 indexed but the songs and album art titles start from 1
+	// we pass the number of songs in sd card as an argument to select screen
 	this->max_ind = max_ind - 1;
 	this->current_max = 0;
-	// current_ind lies between 0 to numSongs - 1
 	this->current_ind = 0;
+
 	this->title = "";
 	this->artist = "";
 	this->album = "";
 
 	// initialization for on screen elements is carried in constructor
-	tft->fillScreen(SS_WHITE);
-	tft->fillTriangle(0, SS_HEIGHT/2, (SS_SWITCH_WIDTH + SS_MARGIN_LR/2),\
-			SS_HEIGHT/2 - (SS_SWITCH_WIDTH + SS_MARGIN_LR)/2,\
-			(SS_SWITCH_WIDTH + SS_MARGIN_LR/2), SS_HEIGHT/2 + \
-			(SS_SWITCH_WIDTH + SS_MARGIN_LR)/2, SS_LIGHTGREY);
-	tft->fillTriangle(SS_WIDTH, SS_HEIGHT/2, SS_WIDTH - (SS_SWITCH_WIDTH \
-			+ SS_MARGIN_LR/2), SS_HEIGHT/2 - (SS_SWITCH_WIDTH + SS_MARGIN_LR)/2,\
-			SS_WIDTH - (SS_SWITCH_WIDTH + SS_MARGIN_LR/2), SS_HEIGHT/2 + \
-			(SS_SWITCH_WIDTH + SS_MARGIN_LR)/2, SS_LIGHTGREY);
+	tft->fillScreen(WHITE);
+	tft->fillTriangle(0, SCREEN_H/2, TRI_H, TRI_Y1, TRI_H, TRI_Y2, GREY);
+	tft->fillTriangle(SCREEN_W, SCREEN_H/2, TRI_RX, TRI_Y1, TRI_RX, TRI_Y2, GREY);
 
 	this->setAlbums(this->current_max + 5);
 }
@@ -104,12 +107,11 @@ SelectScreen::SelectScreen(Adafruit_ILI9341* tft){
 void SelectScreen::drawAlbum(uint32_t index){
 
 	// set album x and y
-	uint16_t album_x = SS_SWITCH_WIDTH + SS_MARGIN_LR + ((index % 6)/2)\
-			*(SS_ALBUM_WIDTH + SS_MARGIN_COL);
-	uint16_t album_y = SS_MARGIN_TB;
+	uint16_t iconX = ICON_ZX + ((index % 6)/2)*(ICON_W + MARGIN_COL);
+	uint16_t iconY = ICON_ZY;
 
 	if ((index % 2) != 0){
-		album_y = album_y + SS_MARGIN_ROW + SS_ALBUM_HEIGHT;
+		iconY += MARGIN_ROW + ICON_H;
 	}
 
 	// the bitmaps for albums are stored in SD card under ssbamps directory
@@ -128,7 +130,7 @@ void SelectScreen::drawAlbum(uint32_t index){
 	char charBuffer[path.length() + 1];
 	path.toCharArray(charBuffer, path.length() + 1);
 
-	bmpDraw(charBuffer, this->tft, album_x, album_y);
+	bmpDraw(charBuffer, this->tft, iconX, iconY);
 }
 
 // code to transition to new screen on clicks registered at sides
@@ -136,37 +138,34 @@ void SelectScreen::drawAlbum(uint32_t index){
 void SelectScreen::setAlbums(int maxIndex){
 
 	// limit it to global max and bottom end to 5
-	if (maxIndex > this->max_ind){
+	if (maxIndex > (int)this->max_ind){
 		maxIndex = this->max_ind;
-	}else if (maxIndex < 0){
+	} else if (maxIndex < 0){
 		maxIndex = 5;
 	}
 
 	// don't change screen on extremeties
-	if(!(maxIndex == this->current_max)){
+	if(!(maxIndex == (int)this->current_max)){
 		this->current_max = maxIndex;
 		uint8_t lowIndex = maxIndex - (maxIndex % 6);
 
-		for(int i = lowIndex; i<=maxIndex; i++){
+		for(int i = lowIndex; i <= maxIndex; i++){
 			this->drawAlbum(i);
 		}
 
 		// in case albums don't fill screen in an extreme case
 		if (maxIndex - lowIndex != 5){
-			for(int i = maxIndex + 1; (i - lowIndex) <=5; i++){
-				// set empty rectangles x and y
-				uint16_t rect_x = SS_SWITCH_WIDTH + SS_MARGIN_LR + ((i% 6)/2)\
-						*(SS_ALBUM_WIDTH + SS_MARGIN_COL);
-				uint16_t rect_y = SS_MARGIN_TB;
+			for (int i = maxIndex + 1; (i - lowIndex) <= 5; i++){
+				// set empty rectangles to replace current album art
+				uint16_t rect_x = ICON_ZX + ((i % 6)/2)*(ICON_W + MARGIN_COL);
+				uint16_t rect_y = ICON_ZY;
 
 				if ((i % 2) != 0){
-					rect_y = rect_y + SS_MARGIN_ROW + SS_ALBUM_HEIGHT;
+					rect_y = rect_y + MARGIN_ROW + ICON_H;
 				}
-				this->tft->fillRect(rect_x, rect_y, SS_ALBUM_WIDTH,\
-					 	SS_ALBUM_HEIGHT, SS_WHITE);
+				this->tft->fillRect(rect_x, rect_y, ICON_W, ICON_H, WHITE);
 			}
 		}
-
 		this->setIndex(lowIndex);
 	}
 }
@@ -182,27 +181,25 @@ void SelectScreen::setIndex(uint32_t index){
 
 	// set old album (album) x and y (to get rectangle origin) and draw white
 	// rectangle around old selection
-	uint16_t album_x = SS_SWITCH_WIDTH + SS_MARGIN_LR + ((this->current_ind % 6)/2) \
-			*(SS_ALBUM_WIDTH + SS_MARGIN_COL) - 2;
-	uint16_t album_y = SS_MARGIN_TB - 2;
+	uint16_t iconX = ICON_ZX + ((this->current_ind % 6)/2)*(ICON_W + MARGIN_COL) - 2;
+	uint16_t iconY = ICON_ZY - 2;
 
 	if ((this->current_ind % 2) != 0){
-		album_y = album_y + SS_MARGIN_ROW + SS_ALBUM_HEIGHT;
+		iconY += MARGIN_ROW + ICON_H;
 	}
 
-	this->tft->drawRect(album_x, album_y, SS_ALBUM_WIDTH + 4, SS_ALBUM_HEIGHT + 4, SS_WHITE);
+	this->tft->drawRect(iconX, iconY, ICON_W + 4, ICON_H + 4, WHITE);
 
 	// set red selection rectangle around new album
 	this->current_ind = index;
-	album_x = SS_SWITCH_WIDTH + SS_MARGIN_LR + ((this->current_ind % 6)/2) \
-			*(SS_ALBUM_WIDTH + SS_MARGIN_COL) - 2;
-	album_y = SS_MARGIN_TB - 2;
+	iconX = ICON_ZX + ((this->current_ind % 6)/2)*(ICON_W + MARGIN_COL) - 2;
+	iconY = ICON_ZY - 2;
 
 	if ((this->current_ind % 2) != 0){
-		album_y = album_y + SS_MARGIN_ROW + SS_ALBUM_HEIGHT;
+		iconY += MARGIN_ROW + ICON_H;
 	}
 
-	this->tft->drawRect(album_x, album_y, SS_ALBUM_WIDTH + 4, SS_ALBUM_HEIGHT + 4, SS_RED);
+	this->tft->drawRect(iconX, iconY, ICON_W + 4, ICON_H + 4, RED);
 	this->setInfo(index);
 	this->printTitle(this->title);
 	this->printArtist(this->artist);
@@ -257,17 +254,15 @@ String SelectScreen::getTitle(){
 
 // set title on the screen while handling text centering
 void SelectScreen::printTitle(String title){
-	this->tft->fillRect(SS_SWITCH_WIDTH, SS_HEIGHT - SS_TEXT_BOX, SS_WIDTH - \
-			2*SS_SWITCH_WIDTH, SS_TEXT_BOX - 1, SS_WHITE);
-	// uncomment this to set a textbox
-	// this->tft->drawRect(SS_SWITCH_WIDTH, SS_HEIGHT - SS_TEXT_BOX, SS_WIDTH - \
-	// 		2*SS_SWITCH_WIDTH, SS_TEXT_BOX - 1, SS_RED);
-	this->tft->setTextColor(SS_RED);
+	this->tft->fillRect(SIDE_W, SCREEN_H - TEXTBOX_H, SCREEN_W - \
+		2*SIDE_W, TEXTBOX_H - 1, WHITE);
+
+	this->tft->setTextColor(RED);
 	this->tft->setTextSize(2);
-	if (title.length() > SS_TEXT2_MAX){
-		title = title.substring(0, SS_TEXT2_MAX - 3) + String("...");
+	if (title.length() > TEXT_MAX/2){
+		title = title.substring(0, TEXT_MAX/2 - 3) + String("...");
 	}
-	this->tft->setCursor(SS_TEXT_CENTER - (title.length()/2)*12, SS_TITLE_Y);
+	this->tft->setCursor(SCREEN_W/2 - (title.length()/2)*12, TITLE_Y);
 	this->tft->print(title);
 }
 
@@ -278,12 +273,12 @@ String SelectScreen::getArtist(){
 
 // set artist on the screen
 void SelectScreen::printArtist(String title){
-	this->tft->setTextColor(SS_RED);
+	this->tft->setTextColor(RED);
 	this->tft->setTextSize(1);
-	if (title.length()>SS_TEXT1_MAX){
-		title = title.substring(0,SS_TEXT1_MAX-3) + String("...");
+	if (title.length()>TEXT_MAX){
+		title = title.substring(0, TEXT_MAX - 3) + String("...");
 	}
-	this->tft->setCursor(SS_TEXT_CENTER - (title.length()/2)*6, SS_ARTIST_Y);
+	this->tft->setCursor(SCREEN_W/2 - (title.length()/2)*6, ARTIST_Y);
 	this->tft->print(title);
 }
 
@@ -294,12 +289,12 @@ String SelectScreen::getAlbum(){
 
 // set album on the screen
 void SelectScreen::printAlbum(String title){
-	this->tft->setTextColor(SS_RED);
+	this->tft->setTextColor(RED);
 	this->tft->setTextSize(1);
-	if (title.length()>SS_TEXT1_MAX){
-		title = title.substring(0,SS_TEXT1_MAX-3) + String("...");
+	if (title.length()>TEXT_MAX){
+		title = title.substring(0,TEXT_MAX-3) + String("...");
 	}
-	this->tft->setCursor(SS_TEXT_CENTER - (title.length()/2)*6, SS_ALBUM_Y);
+	this->tft->setCursor(SCREEN_W/2 - (title.length()/2)*6, ALBUM_Y);
 	this->tft->print(title);
 }
 
@@ -307,16 +302,16 @@ void SelectScreen::printAlbum(String title){
 // select to play
 bool SelectScreen::handleTouch(uint16_t tx, uint16_t ty){
 	// the extremeties are handled inside setAlbums
-	if (tx < (SS_SWITCH_WIDTH + SS_MARGIN_LR)){
+	if (tx < (ICON_ZX)){
 		int callIndex = this->current_max - (this->current_max % 6) - 1;
 		this->setAlbums(callIndex);
 		return false;
-	} else if (tx > SS_WIDTH - (SS_SWITCH_WIDTH + SS_MARGIN_LR)){
+	} else if (tx > SCREEN_W - (ICON_ZX)){
 		// the higher than expected extreme would be handles inside setAlbums
 		int callIndex = this->current_max + 6;
 		this->setAlbums(callIndex);
 		return false;
-	} else if (ty < SS_HEIGHT - SS_TEXT_BOX){
+	} else if (ty < SCREEN_H - TEXTBOX_H){
 		// get index of album if an album was touched
 		uint8_t touchedIndex = this->handleAlbumTouch(tx, ty);
 		if (touchedIndex == this->current_ind){
@@ -335,14 +330,14 @@ bool SelectScreen::handleTouch(uint16_t tx, uint16_t ty){
 uint8_t SelectScreen::handleAlbumTouch(uint16_t tx, uint16_t ty){
 	uint8_t index = this->current_max - (this->current_max % 6);
 	// increase index by 1 if it's in bottom row
-	if (ty > SS_MARGIN_TB + SS_ALBUM_HEIGHT + SS_MARGIN_ROW/2){
+	if (ty > MARGIN_TB + ICON_H + MARGIN_ROW/2){
 		index += 1;
 	}
-	tx = tx - SS_SWITCH_WIDTH - SS_MARGIN_LR;
-	if (tx > SS_ALBUM_WIDTH + SS_MARGIN_COL/2){
+	tx = tx - SIDE_W - MARGIN_LR;
+	if (tx > ICON_W + MARGIN_COL/2){
 		index += 2;
 	}
-	if (tx > 2*SS_ALBUM_WIDTH + SS_MARGIN_COL*(3/2)){
+	if (tx > 2*ICON_W + MARGIN_COL*(3/2)){
 		index += 2;
 	}
 	return index;

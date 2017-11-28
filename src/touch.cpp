@@ -14,7 +14,7 @@
 #define TS_MAXX 900
 #define TS_MAXY 940
 
-#define MINPRESSURE 10
+#define MINPRESSURE 100
 #define MAXPRESSURE 1000
 
 #define TH_WIDTH 320

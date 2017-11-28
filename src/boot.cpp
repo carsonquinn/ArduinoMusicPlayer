@@ -11,7 +11,7 @@
 		Width:
 			30 pixels on both left and right as margin
             290 pixels used by Textbox in bottom
-            150 pixels used by icon, rest is empty space
+            150 pixels used by icon (centered), rest is empty space
 
 		Height:
             10 pixels as top margin
@@ -30,28 +30,37 @@
 #include "boot.h"
 #include "bmp_disp.h"
 
-#define BT_RED 0xF800
-#define BT_WHITE 0xFFFF
+// these definitons are for setting different margins and icons on screen.
+// They're set for a 320*240 tft screen. Will need to change according
+// to your screen, check documentation above for a better description
 
-#define BT_MARGIN 10
-#define BT_MARGIN_LR 30
+#define RED 0xF800
+#define WHITE 0xFFFF
 
-#define BT_TEXT_HEIGHT 8
-#define BT_TEXT_WIDTH 5
-#define BT_TEXT_CENTER 160
-#define BT_TEXTBOX 30
+#define MARGIN 10
+#define MARGIN_SIDE 30
 
-#define BT_ICON_WIDTH 150
-#define BT_ICON_HEIGHT 150
+// text height and width are for font size 1, scale for other sizes
+#define TEXT_H 8
+#define TEXTBOX_H 30
+#define TEXT_Y 10
+#define TITLE_Y 204
 
-#define BT_WIDTH 320
-#define BT_HEIGHT 240
+#define ICON_X 85
+#define ICON_Y 36
+#define ICON_W 150
+#define ICON_H 150
 
+#define SCREEN_W 320
+#define SCREEN_H 240
+
+// text states for animation
 #define NO_TEXT 0
 #define TEXT 1
 
 // adafruit_ILI9341 *tft;
 Boot::Boot(Adafruit_ILI9341* tft){
+	// last time is the last animation time
 	this->tft = tft;
     this->text_state = NO_TEXT;
     this->last_time = 0;
@@ -62,42 +71,35 @@ Boot::Boot(Adafruit_ILI9341* tft){
 // set screen items
 void Boot::setScreen(){
     // set icon
-    bmpDraw("/icons/main.bmp", this->tft, (BT_WIDTH - BT_ICON_WIDTH)/2, \
-            2*BT_MARGIN + BT_TEXT_HEIGHT*2);
-
-    // draw text box, uncomment this to draw it
-    // this->tft->drawRect(BT_MARGIN_LR, 3*BT_MARGIN + 2*BT_TEXT_HEIGHT + BT_ICON_HEIGHT,\
-    //         BT_WIDTH - 2*BT_MARGIN_LR, BT_TEXTBOX, BT_RED);
+    bmpDraw("/icons/main.bmp", this->tft, ICON_X, ICON_Y);
 
     String title = "Arduino Music Player";
 
     this->tft->setTextSize(2);
-    this->tft->setTextColor(BT_RED);
-    this->tft->setCursor(BT_TEXT_CENTER - (title.length()/2)*12, \
-            3*BT_MARGIN + 2*BT_TEXT_HEIGHT + BT_ICON_HEIGHT + BT_TEXTBOX/4);
+    this->tft->setTextColor(RED);
+    this->tft->setCursor(SCREEN_W/2 - (title.length()/2)*12, TITLE_Y);
 	this->tft->print(title);
-
 }
 
 // set text animation if current time is greater than last animation time
-// by 1000 millis
+// by 1000 millisecond
 void Boot::animate(int rtime){
-    String msg = "Touch screen to begin!";
+    String text = "Touch screen to begin!";
+
     if (rtime - this->last_time > 1000){
         if (this->text_state == NO_TEXT){
             this->tft->setTextSize(2);
-            this->tft->setTextColor(BT_RED);
-            this->tft->setCursor(BT_TEXT_CENTER - (msg.length()/2)*12, BT_MARGIN);
-        	this->tft->print(msg);
+            this->tft->setTextColor(RED);
+            this->tft->setCursor(SCREEN_W/2 - (text.length()/2)*12, TEXT_Y);
+        	this->tft->print(text);
 
             // set class fields, set last_time to current run time
             // set text_state to TEXT since we wrote on screen
             this->text_state = TEXT;
             this->last_time = millis();
         }else{
-            // draw empty rectangle
-            this->tft->fillRect(0, 0,\
-                    BT_WIDTH, 2*(BT_MARGIN + BT_TEXT_HEIGHT), BT_WHITE);
+            // draw empty rectangle to clear text box region
+            this->tft->fillRect(0, 0, SCREEN_W, ICON_Y, WHITE);
             // set class fields
             this->text_state = NO_TEXT;
             this->last_time = millis();
