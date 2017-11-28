@@ -68,7 +68,7 @@ int main(){
 	Boot boot = Boot(&tft);
 	Touch touch = Touch();
 
-  	music_player.play(37);
+  	music_player.play(9);
 
   	while(true){
 		// code for Boot screen

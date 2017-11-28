@@ -68,7 +68,7 @@
 #define SS_SWITCH_WIDTH 30
 
 // adafruit_ILI9341 *tft;
-SelectScreen::SelectScreen(Adafruit_ILI9341* tft, uint8_t max_ind){
+SelectScreen::SelectScreen(Adafruit_ILI9341* tft, uint32_t max_ind){
 
 	this->tft = tft;
 	// -1 since the class is 0 indexed but the songs and album art titles start from 1
@@ -82,8 +82,6 @@ SelectScreen::SelectScreen(Adafruit_ILI9341* tft, uint8_t max_ind){
 
 	// initialization for on screen elements is carried in constructor
 	tft->fillScreen(SS_WHITE);
-	tft->drawRect(SS_SWITCH_WIDTH, SS_HEIGHT - SS_TEXT_BOX, SS_WIDTH - \
-			2*SS_SWITCH_WIDTH, SS_TEXT_BOX - 1, SS_RED);
 	tft->fillTriangle(0, SS_HEIGHT/2, (SS_SWITCH_WIDTH + SS_MARGIN_LR/2),\
 			SS_HEIGHT/2 - (SS_SWITCH_WIDTH + SS_MARGIN_LR)/2,\
 			(SS_SWITCH_WIDTH + SS_MARGIN_LR/2), SS_HEIGHT/2 + \
@@ -103,7 +101,7 @@ SelectScreen::SelectScreen(Adafruit_ILI9341* tft){
 
 // draw album art corresponding to index, handles getting and drawing album art
 // when set albums is called
-void SelectScreen::drawAlbum(uint8_t index){
+void SelectScreen::drawAlbum(uint32_t index){
 
 	// set album x and y
 	uint16_t album_x = SS_SWITCH_WIDTH + SS_MARGIN_LR + ((index % 6)/2)\
@@ -180,7 +178,7 @@ uint8_t SelectScreen::getIndex(){
 
 // change current index, set selection rectangles around old and new
 // selections and set new music information from mp3 tags
-void SelectScreen::setIndex(uint8_t index){
+void SelectScreen::setIndex(uint32_t index){
 
 	// set old album (album) x and y (to get rectangle origin) and draw white
 	// rectangle around old selection
@@ -212,7 +210,7 @@ void SelectScreen::setIndex(uint8_t index){
 }
 
 // set info fields
-void SelectScreen::setInfo(uint8_t index){
+void SelectScreen::setInfo(uint32_t index){
 	String path = "/texts/";
 	String ind = "";
 
@@ -253,7 +251,7 @@ void SelectScreen::setInfo(uint8_t index){
 }
 
 // get title from the fields
-String SelectScreen::getTitle(uint8_t index){
+String SelectScreen::getTitle(uint32_t index){
 	return this->title;
 }
 
@@ -261,8 +259,9 @@ String SelectScreen::getTitle(uint8_t index){
 void SelectScreen::printTitle(String title){
 	this->tft->fillRect(SS_SWITCH_WIDTH, SS_HEIGHT - SS_TEXT_BOX, SS_WIDTH - \
 			2*SS_SWITCH_WIDTH, SS_TEXT_BOX - 1, SS_WHITE);
-	this->tft->drawRect(SS_SWITCH_WIDTH, SS_HEIGHT - SS_TEXT_BOX, SS_WIDTH - \
-			2*SS_SWITCH_WIDTH, SS_TEXT_BOX - 1, SS_RED);
+	// uncomment this to set a textbox
+	// this->tft->drawRect(SS_SWITCH_WIDTH, SS_HEIGHT - SS_TEXT_BOX, SS_WIDTH - \
+	// 		2*SS_SWITCH_WIDTH, SS_TEXT_BOX - 1, SS_RED);
 	this->tft->setTextColor(SS_RED);
 	this->tft->setTextSize(2);
 	if (title.length() > SS_TEXT2_MAX){
@@ -273,7 +272,7 @@ void SelectScreen::printTitle(String title){
 }
 
 // get artist from the fields
-String SelectScreen::getArtist(uint8_t index){
+String SelectScreen::getArtist(uint32_t index){
 	return this->artist;
 }
 
@@ -289,7 +288,7 @@ void SelectScreen::printArtist(String title){
 }
 
 // get album from the fields
-String SelectScreen::getAlbum(uint8_t index){
+String SelectScreen::getAlbum(uint32_t index){
 	return this->album;
 }
 

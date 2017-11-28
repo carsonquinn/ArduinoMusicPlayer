@@ -65,9 +65,9 @@ void Boot::setScreen(){
     bmpDraw("/icons/main.bmp", this->tft, (BT_WIDTH - BT_ICON_WIDTH)/2, \
             2*BT_MARGIN + BT_TEXT_HEIGHT*2);
 
-    // draw text box
-    this->tft->drawRect(BT_MARGIN_LR, 3*BT_MARGIN + 2*BT_TEXT_HEIGHT + BT_ICON_HEIGHT,\
-            BT_WIDTH - 2*BT_MARGIN_LR, BT_TEXTBOX, BT_RED);
+    // draw text box, uncomment this to draw it
+    // this->tft->drawRect(BT_MARGIN_LR, 3*BT_MARGIN + 2*BT_TEXT_HEIGHT + BT_ICON_HEIGHT,\
+    //         BT_WIDTH - 2*BT_MARGIN_LR, BT_TEXTBOX, BT_RED);
 
     String title = "Arduino Music Player";
 
