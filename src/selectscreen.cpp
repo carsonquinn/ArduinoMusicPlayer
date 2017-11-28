@@ -251,7 +251,7 @@ void SelectScreen::setInfo(uint32_t index){
 }
 
 // get title from the fields
-String SelectScreen::getTitle(uint32_t index){
+String SelectScreen::getTitle(){
 	return this->title;
 }
 
@@ -272,7 +272,7 @@ void SelectScreen::printTitle(String title){
 }
 
 // get artist from the fields
-String SelectScreen::getArtist(uint32_t index){
+String SelectScreen::getArtist(){
 	return this->artist;
 }
 
@@ -288,7 +288,7 @@ void SelectScreen::printArtist(String title){
 }
 
 // get album from the fields
-String SelectScreen::getAlbum(uint32_t index){
+String SelectScreen::getAlbum(){
 	return this->album;
 }
 
