@@ -311,7 +311,7 @@ void PlayScreen::animate( ){
 	if (this->isPlaying && (millis() - this->lastAnimate) > 1000){
 		unsigned long runTime = millis() - this->startTime;
 		float progress = (float)runTime/(float)(this->songLen*1000);
-		if (progress >= 1){
+		if (progress >= 1 && this->isLooping){
 			this->startTime = millis();
 		}
 		this->drawProgressBar(progress*100);
