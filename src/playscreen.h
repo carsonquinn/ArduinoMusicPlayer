@@ -30,7 +30,6 @@ private:
 	void onLoopClick();
 	void onVolumeUpClick();
 	void onVolumeDownClick();
-	void onProgressBarClick(int percentage);
 
 	void draw();
 	void drawVolumeBar(uint8_t volume);
@@ -46,7 +45,8 @@ private:
 
 public:
  	PlayScreen(Adafruit_ILI9341* tft);
-	PlayScreen(Adafruit_ILI9341* tft, DFRobotDFPlayerMini* musicPlayer, uint32_t index);
+	PlayScreen(Adafruit_ILI9341* tft, DFRobotDFPlayerMini* musicPlayer,\
+		 uint32_t index, uint32_t maxIndex);
 
 	bool handleTouch(uint16_t tx, uint16_t ty, int state);
 

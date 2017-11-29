@@ -116,7 +116,7 @@ int main(){
 		// code to transition back to SelectScreen
 		} else if (state == PLAY_TO_SELECT){
 			ss = SelectScreen(&tft, musicPlayer.readFileCounts()/2);
-			state = SELECT;
+			state = SELECT_SCREEN;
 		}
   	}
 

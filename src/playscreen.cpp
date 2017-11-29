@@ -70,7 +70,8 @@
 #define VOLBAR_H 4
 #define VOLBAR_UNIT 11
 
-// music info on screen location, TSIDE_W is space left on sides for textbox
+// music info on screen location, TSIDE_W is space left on sides
+// for textbox (not drawn just imaginary boundary)
 #define TEXTBOX_H 50
 #define TSIDE_W 30
 #define TEXT_MAX 44
@@ -97,7 +98,7 @@ PlayScreen::PlayScreen(Adafruit_ILI9341* tft, DFRobotDFPlayerMini* musicPlayer,\
 	this->isLooping = false;
 
 	this->index = index;
-	this->maxIndex = maxIndex;
+	this->maxIndex = maxIndex - 1;
 	this->title = "";
 	this->artist = "";
 	this->album = "";
@@ -109,7 +110,8 @@ PlayScreen::PlayScreen(Adafruit_ILI9341* tft, DFRobotDFPlayerMini* musicPlayer,\
 
 	this->setInfo(index);
 	this->draw();
-	this->musicPlayer->play(index);
+	// music index is 2*index + 1 plus screen index
+	this->musicPlayer->play(2*index + 1);
 }
 
 PlayScreen::PlayScreen(Adafruit_ILI9341* tft){
@@ -141,11 +143,6 @@ bool PlayScreen::handleTouch(uint16_t tx, uint16_t ty, int state){
 		// move to SelectScreen on icon click
 		else if(isTouched(tx, ty, ICON_X, ICON_Y, ICON_W, ICON_H)){
 			checkVar = true;
-		}
-		// scrolling for progress bar
-		else if(isTouched(tx, ty, 0, PROGBAR_Y - PROGBAR_MARGIN, SCREEN_W,\
-			PROGBAR_H + PROGBAR_MARGIN)){
-			onProgressBarClick(((tx)/(SCREEN_W))*100);
 		}
 	}
 	// for buttons that perform action on hold (volume controls)
@@ -207,8 +204,7 @@ void PlayScreen::setInfo(uint32_t index){
 
 // set title on the screen while handling text centering
 void PlayScreen::printTitle(String title){
-	this->tft->fillRect(TSIDE_W, SCREEN_H - TEXTBOX_H, SCREEN_W - \
-		2*TSIDE_W, TEXTBOX_H - 1, WHITE);
+	this->tft->fillRect(TSIDE_W, TITLE_Y, SCREEN_W - 2*TSIDE_W, TEXTBOX_H, WHITE);
 
 	this->tft->setTextColor(RED);
 	this->tft->setTextSize(2);
@@ -307,18 +303,20 @@ void PlayScreen::onPlayClick(){
 				// if music was currently playing, we want to change the state to paused
 				this->isPlaying = false;
 				this->musicPlayer->pause();
-				bmpDraw("/icons/pause.bmp", this->tft, PLAY_X, PLAY_Y);
+				bmpDraw("/icons/play.bmp", this->tft, PLAY_X, PLAY_Y);
 			}else{
 				//if music was paused, unpause and redraw
 				this->isPlaying = true;
-				this->musicPlayer->play();
-				bmpDraw("/icons/play.bmp", this->tft, PLAY_X, PLAY_Y);
+				this->musicPlayer->start();
+				bmpDraw("/icons/pause.bmp", this->tft, PLAY_X, PLAY_Y);
 			}
 }
 
 // move to next song, reset loop, play, icon and titles
 void PlayScreen::onForwardClick(){
 	if (this->index < this->maxIndex){
+		this->musicPlayer->pause();
+
 		this->index++;
 		this->isPlaying = true;
 		this->isLooping = false;
@@ -331,12 +329,17 @@ void PlayScreen::onForwardClick(){
 		this->printTitle(this->title);
 		this->printArtist(this->artist);
 		this->printAlbum(this->album);
+
+		// play new song
+		this->musicPlayer->play(2*this->index + 1);
 	}
 }
 
 // move to previous song, reset loop, play, icon and titles
 void PlayScreen::onReverseClick(){
 	if (this->index > 0){
+		this->musicPlayer->pause();
+
 		this->index--;
 		this->isPlaying = true;
 		this->isLooping = false;
@@ -349,6 +352,9 @@ void PlayScreen::onReverseClick(){
 		this->printTitle(this->title);
 		this->printArtist(this->artist);
 		this->printAlbum(this->album);
+
+		// play new song
+		this->musicPlayer->play(2*this->index + 1);
 	}
 
 }
@@ -363,7 +369,7 @@ void PlayScreen::onLoopClick(){
 			// sets red looping icon on setting loop to true
 			this->isLooping = true;
 			this->musicPlayer->enableLoop();
-			this->musicPlayer->loop(index);
+			this->musicPlayer->loop(2*index + 1);
 			bmpDraw("/icons/repeatR.bmp", this->tft, LOOP_X, LOOP_Y);
 
 		}
@@ -372,29 +378,24 @@ void PlayScreen::onLoopClick(){
 // volume click works on pressed instead of release so we have to
 // check for time since hold every iteration to slow it down a bit
 void PlayScreen::onVolumeUpClick(){
-	if(millis() - (this->volDelay) > 250){
+	if(millis() - (this->volDelay) > 500){
 		if(this->volume < 30){
 		this->volume += 2;
 		this->musicPlayer->volume(this->volume);
-		}
 		this->drawVolumeBar(this->volume);
 		this->volDelay = millis();
+		}
 	}
 }
 
 // same as previous but to decrease volume
 void PlayScreen::onVolumeDownClick(){
-	if(millis()-(this->volDelay) > 250){
+	if(millis() - (this->volDelay) > 500){
 		if(this->volume > 0){
 			this->volume -= 2;
 			this->musicPlayer->volume(this->volume);
+			this->drawVolumeBar(this->volume);
+			this->volDelay = millis();
 		}
-		this->drawVolumeBar(this->volume);
-		this->volDelay = millis();
 	}
-}
-
-void PlayScreen::onProgressBarClick(int percentage){
-	Serial.print("progress");
-	Serial.flush();
 }

@@ -312,21 +312,25 @@ bool SelectScreen::handleTouch(uint16_t tx, uint16_t ty){
 		int callIndex = this->currentMax - (this->currentMax % 6) - 1;
 		this->setAlbums(callIndex);
 		return false;
+
 	} else if (tx > SCREEN_W - (ICON_ZX)){
 		// the higher than expected extreme would be handles inside setAlbums
 		int callIndex = this->currentMax + 6;
 		this->setAlbums(callIndex);
 		return false;
+
 	} else if (ty < SCREEN_H - TEXTBOX_H){
 		// get index of album if an album was touched
 		uint8_t touchedIndex = this->handleAlbumTouch(tx, ty);
 		if (touchedIndex == this->index){
 			return true;
+
 		}else if (touchedIndex <= this->maxIndex){
 			this->setIndex(touchedIndex);
 			// small delay prevents multi-touch
 			delay(500);
 			return false;
+			
 		}else{
 			return false;
 		}
