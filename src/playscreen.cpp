@@ -150,7 +150,7 @@ bool PlayScreen::handleTouch(uint16_t tx, uint16_t ty, int state){
 		if(isTouched(tx, ty, VOLUP_X, VOLUP_Y, VOL_W, VOL_H)){
 			onVolumeUpClick();
 		}
-		if(isTouched(tx, ty, VOLDOWN_X, VOLDOWN_Y, VOL_W, VOL_H)){
+		else if(isTouched(tx, ty, VOLDOWN_X, VOLDOWN_Y, VOL_W, VOL_H)){
 			onVolumeDownClick();
 		}
 	}
@@ -368,7 +368,6 @@ void PlayScreen::onLoopClick(){
 		}else{
 			// sets red looping icon on setting loop to true
 			this->isLooping = true;
-			this->musicPlayer->enableLoop();
 			this->musicPlayer->loop(2*index + 1);
 			bmpDraw("/icons/repeatR.bmp", this->tft, LOOP_X, LOOP_Y);
 
@@ -378,7 +377,7 @@ void PlayScreen::onLoopClick(){
 // volume click works on pressed instead of release so we have to
 // check for time since hold every iteration to slow it down a bit
 void PlayScreen::onVolumeUpClick(){
-	if(millis() - (this->volDelay) > 500){
+	if(millis() - (this->volDelay) > 200){
 		if(this->volume < 30){
 		this->volume += 2;
 		this->musicPlayer->volume(this->volume);
@@ -390,7 +389,7 @@ void PlayScreen::onVolumeUpClick(){
 
 // same as previous but to decrease volume
 void PlayScreen::onVolumeDownClick(){
-	if(millis() - (this->volDelay) > 500){
+	if(millis() - (this->volDelay) > 200){
 		if(this->volume > 0){
 			this->volume -= 2;
 			this->musicPlayer->volume(this->volume);

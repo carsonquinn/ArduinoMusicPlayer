@@ -22,7 +22,7 @@ private:
 	float songLen;
 
 	//time since the volume has changed
-	int volDelay;
+	unsigned long volDelay;
 
 	void onPlayClick();
 	void onForwardClick();

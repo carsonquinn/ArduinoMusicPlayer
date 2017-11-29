@@ -5,8 +5,8 @@ class Boot{
 
 private:
     Adafruit_ILI9341* tft;
-    int text_state;
-    int last_time;
+    int textState;
+    unsigned long lastTime;
 
 public:
     Boot(Adafruit_ILI9341* tft);

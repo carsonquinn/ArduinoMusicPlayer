@@ -62,8 +62,8 @@
 Boot::Boot(Adafruit_ILI9341* tft){
 	// last time is the last animation time
 	this->tft = tft;
-    this->text_state = NO_TEXT;
-    this->last_time = 0;
+    this->textState = NO_TEXT;
+    this->lastTime = 0;
 
     this->setScreen();
 }
@@ -86,23 +86,23 @@ void Boot::setScreen(){
 void Boot::animate(int rtime){
     String text = "Touch screen to begin!";
 
-    if (rtime - this->last_time > 1000){
-        if (this->text_state == NO_TEXT){
+    if (rtime - this->lastTime > 1000){
+        if (this->textState == NO_TEXT){
             this->tft->setTextSize(2);
             this->tft->setTextColor(RED);
             this->tft->setCursor(SCREEN_W/2 - (text.length()/2)*12, TEXT_Y);
         	this->tft->print(text);
 
-            // set class fields, set last_time to current run time
-            // set text_state to TEXT since we wrote on screen
-            this->text_state = TEXT;
-            this->last_time = millis();
+            // set class fields, set lastTime to current run time
+            // set textState to TEXT since we wrote on screen
+            this->textState = TEXT;
+            this->lastTime = millis();
         }else{
             // draw empty rectangle to clear text box region
             this->tft->fillRect(0, 0, SCREEN_W, ICON_Y, WHITE);
             // set class fields
-            this->text_state = NO_TEXT;
-            this->last_time = millis();
+            this->textState = NO_TEXT;
+            this->lastTime = millis();
         }
     }
 }
