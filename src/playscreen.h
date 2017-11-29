@@ -38,6 +38,7 @@ private:
 	void draw();
 	void drawVolumeBar(uint8_t volume);
 	void drawProgressBar(float progress);
+	void resetProgressBar();
 	void drawIcon(uint32_t index);
 
 	void setInfo(uint32_t index);

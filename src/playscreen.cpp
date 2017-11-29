@@ -255,8 +255,12 @@ void PlayScreen::printAlbum(String title){
 // progress is in percent and is calculated when the function is called
 // at animate
 void PlayScreen::drawProgressBar(float progress){
-	this->tft->fillRect(0, PROGBAR_Y, SCREEN_W, PROGBAR_H, WHITE);
 	this->tft->fillRect(0, PROGBAR_Y, (SCREEN_W*progress)/100, PROGBAR_H, RED);
+}
+
+// resetting progress bar to 0
+void PlayScreen::resetProgressBar(){
+	this->tft->fillRect(0, PROGBAR_Y, SCREEN_W, PROGBAR_H, WHITE);
 }
 
 // draw the album art
@@ -289,7 +293,7 @@ void PlayScreen::drawVolumeBar(uint8_t volume){
 // sets buttons at initialization
 void PlayScreen::draw(){
 	this->tft->fillScreen(WHITE);
-	this->drawProgressBar(0);
+	this->resetProgressBar();
 	this->drawVolumeBar(this->volume);
 	this->drawIcon(this->index);
 
@@ -312,7 +316,10 @@ void PlayScreen::animate( ){
 		unsigned long runTime = millis() - this->startTime;
 		float progress = (float)runTime/(float)(this->songLen*1000);
 		if (progress >= 1 && this->isLooping){
+			this->resetProgressBar();
 			this->startTime = millis();
+		} else if (progress >= 1){
+			progress = 1;
 		}
 		this->drawProgressBar(progress*100);
 		this->lastAnimate = millis();
@@ -353,7 +360,7 @@ void PlayScreen::onForwardClick(){
 
 		// music info and drawing
 		this->setInfo(this->index);
-		this->drawProgressBar(0);
+		this->resetProgressBar();
 		this->drawIcon(this->index);
 		this->printTitle(this->title);
 		this->printArtist(this->artist);
@@ -377,7 +384,7 @@ void PlayScreen::onReverseClick(){
 
 		// music info and drawing
 		this->setInfo(this->index);
-		this->drawProgressBar(0);
+		this->resetProgressBar();
 		this->drawIcon(this->index);
 		this->printTitle(this->title);
 		this->printArtist(this->artist);
@@ -400,6 +407,7 @@ void PlayScreen::onLoopClick(){
 			// sets red looping icon on setting loop to true
 			this->isLooping = true;
 			this->musicPlayer->loop(2*index + 1);
+			this->resetProgressBar();
 			this->startTime = millis();
 			bmpDraw("/icons/repeatR.bmp", this->tft, LOOP_X, LOOP_Y);
 
