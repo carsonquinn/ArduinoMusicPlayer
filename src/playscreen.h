@@ -27,15 +27,19 @@ private:
 	void onForwardClick();
 	void onReverseClick();
 	void onLoopClick();
-	void onVolUpClick();
-	void onVolDownClick();
-	void onIconClick();
+	void onVolumeUpClick();
+	void onVolumeDownClick();
 	void onProgressBarClick(int percentage);
 
 	void draw();
-	void drawVolumeBar();
+	void drawVolumeBar(uint8_t volume);
 	void drawProgressBar(int progress);
-	void drawIcon();
+	void drawIcon(uint32_t index);
+
+	void setInfo(uint32_t index);
+	void printTitle(String title);
+	void printArtist(String title);
+	void printAlbum(String title);
 
 	bool isTouched(int tx, int ty, int x, int y, int w, int h);
 
