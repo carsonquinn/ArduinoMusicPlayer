@@ -1,6 +1,6 @@
 ######################################################
 # Arduino UA Child Makefile (UPDATED: 24/11/2017)
-#	This is the Makefile developed for CMPUT 274 by Prof. Zach Friggstad
+# This is the Makefile developed for CMPUT 274 by Prof. Zach Friggstad
 # The main makefile derives from https://github.com/sudar/Arduino-Makefile
 # Add it to your arduino folder and change te default install location (line 32)
 # Add the libraries in line 23 to your default libraries path. For more information

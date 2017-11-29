@@ -21,8 +21,12 @@ private:
 	String album;
 	float songLen;
 
-	//time since the volume has changed
+	// time since the volume has changed
 	unsigned long volDelay;
+	// song start time and pause Time counter
+	unsigned long startTime;
+	unsigned long pauseTime;
+	unsigned long lastAnimate;
 
 	void onPlayClick();
 	void onForwardClick();
@@ -33,7 +37,7 @@ private:
 
 	void draw();
 	void drawVolumeBar(uint8_t volume);
-	void drawProgressBar(uint8_t progress);
+	void drawProgressBar(float progress);
 	void drawIcon(uint32_t index);
 
 	void setInfo(uint32_t index);
@@ -49,6 +53,7 @@ public:
 		 uint32_t index, uint32_t maxIndex);
 
 	bool handleTouch(uint16_t tx, uint16_t ty, int state);
+	void animate( );
 
 };
 #endif

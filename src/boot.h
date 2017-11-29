@@ -12,7 +12,7 @@ public:
     Boot(Adafruit_ILI9341* tft);
 
     void setScreen();
-    void animate(int rtime);
+    void animate(unsigned long rtime);
 };
 
 #endif

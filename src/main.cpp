@@ -106,6 +106,7 @@ int main(){
 			// get touch and pass params to playscreen to handle it
 			touch.processTouch();
 			bool move = false;
+			ps.animate();
 			move = ps.handleTouch(touch.getX(), touch.getY(), touch.getState());
 			// the touch handler for class returns true if state change
 			// action has been processed

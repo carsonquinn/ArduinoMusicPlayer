@@ -83,7 +83,7 @@ void Boot::setScreen(){
 
 // set text animation if current time is greater than last animation time
 // by 1000 millisecond
-void Boot::animate(int rtime){
+void Boot::animate(unsigned long rtime){
     String text = "Touch screen to begin!";
 
     if (rtime - this->lastTime > 1000){

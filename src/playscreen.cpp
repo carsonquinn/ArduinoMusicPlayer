@@ -7,7 +7,19 @@
 	explanatory in macros, this explains how the screen is divided
 	Space division:
 		Width:
+			20 pixels margin on left
+			150 pixels for album icons
+			150 pixels on the right are for icons (arranged differently in 3 layers)
+			Note - the bottom layer below icon has a textbox space to display music info
 
+		Height:
+			16 pixels (8 margin) for volume bar
+			150 pixels for album icon
+			Note - on the right of album art, the 150 pixels are divided into
+			3 layers of button, an 80 pixel play button, 30 pixels forward and
+			reverse and 30 picels volume and loop and the rest margins
+			50 pixels for textbox
+			15 pixels for progress bar (5 margin)
 */
 
 #include <Adafruit_GFX.h>    // Core graphics library
@@ -17,7 +29,6 @@
 #include <SD.h>
 #include "bmp_disp.h"
 #include "playscreen.h"
-
 
 #define BLACK 0x0000
 #define RED 0xF800
@@ -110,8 +121,11 @@ PlayScreen::PlayScreen(Adafruit_ILI9341* tft, DFRobotDFPlayerMini* musicPlayer,\
 
 	this->setInfo(index);
 	this->draw();
+
 	// music index is 2*index + 1 plus screen index
 	this->musicPlayer->play(2*index + 1);
+	this->startTime = millis();
+	this->lastAnimate = millis();
 }
 
 PlayScreen::PlayScreen(Adafruit_ILI9341* tft){
@@ -240,9 +254,9 @@ void PlayScreen::printAlbum(String title){
 // draws the progress bar for the song respective to current play time
 // progress is in percent and is calculated when the function is called
 // at animate
-void PlayScreen::drawProgressBar(uint8_t progress){
+void PlayScreen::drawProgressBar(float progress){
 	this->tft->fillRect(0, PROGBAR_Y, SCREEN_W, PROGBAR_H, WHITE);
-	this->tft->fillRect(0, PROGBAR_Y, SCREEN_W*progress/100, PROGBAR_H, RED);
+	this->tft->fillRect(0, PROGBAR_Y, (SCREEN_W*progress)/100, PROGBAR_H, RED);
 }
 
 // draw the album art
@@ -292,6 +306,19 @@ void PlayScreen::draw(){
 	this->printAlbum(this->album);
 }
 
+// moves progress bar
+void PlayScreen::animate( ){
+	if (this->isPlaying && (millis() - this->lastAnimate) > 1000){
+		unsigned long runTime = millis() - this->startTime;
+		float progress = (float)runTime/(float)(this->songLen*1000);
+		if (progress >= 1){
+			this->startTime = millis();
+		}
+		this->drawProgressBar(progress*100);
+		this->lastAnimate = millis();
+	}
+}
+
 // checks for touch for various buttons/icons using button/icon location
 bool PlayScreen::isTouched(int tx, int ty, int x, int y, int w, int h){
 	return (tx > x && tx < (x+w)) &&  (ty > y && ty < (y+h));
@@ -303,11 +330,13 @@ void PlayScreen::onPlayClick(){
 				// if music was currently playing, we want to change the state to paused
 				this->isPlaying = false;
 				this->musicPlayer->pause();
+				this->pauseTime = millis();
 				bmpDraw("/icons/play.bmp", this->tft, PLAY_X, PLAY_Y);
 			}else{
 				//if music was paused, unpause and redraw
 				this->isPlaying = true;
 				this->musicPlayer->start();
+				this->startTime += millis() - this->pauseTime;
 				bmpDraw("/icons/pause.bmp", this->tft, PLAY_X, PLAY_Y);
 			}
 }
@@ -332,6 +361,7 @@ void PlayScreen::onForwardClick(){
 
 		// play new song
 		this->musicPlayer->play(2*this->index + 1);
+		this->startTime = millis();
 	}
 }
 
@@ -355,6 +385,7 @@ void PlayScreen::onReverseClick(){
 
 		// play new song
 		this->musicPlayer->play(2*this->index + 1);
+		this->startTime = millis();
 	}
 
 }
@@ -369,6 +400,7 @@ void PlayScreen::onLoopClick(){
 			// sets red looping icon on setting loop to true
 			this->isLooping = true;
 			this->musicPlayer->loop(2*index + 1);
+			this->startTime = millis();
 			bmpDraw("/icons/repeatR.bmp", this->tft, LOOP_X, LOOP_Y);
 
 		}
