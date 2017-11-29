@@ -8,7 +8,7 @@
 
 	If you're using a different screen, do your calculations first
 	On 4:3 aspect,just multiplying everything by the the ratio compared to
-	320:240 screen would do it but you would need to chage the numbers on other
+	320:240 screen would do it but you would need to change the numbers on other
 	screens
 
 	Space division:
@@ -52,6 +52,7 @@
 #define MARGIN_COL 15
 #define MARGIN_ROW 20
 
+// music info on screen location
 #define TEXTBOX_H 50
 #define TEXT_MAX 44
 
@@ -171,7 +172,7 @@ void SelectScreen::setAlbums(int maxIndex){
 }
 
 // return current index, is 1 less than music file it correspinds to
-uint8_t SelectScreen::getIndex(){
+uint32_t SelectScreen::getIndex(){
 	return this->index;
 }
 

@@ -2,6 +2,14 @@
 	Class to handle all the UI elements for PlayScreen mode.
 */
 
+/*
+	Space division for PlayScreen. The icon/button definitons are self
+	explanatory in macros, this explains how the screen is divided
+	Space division:
+		Width:
+
+*/
+
 #include <Adafruit_GFX.h>    // Core graphics library
 #include <Adafruit_ILI9341.h> // Hardware-specific library
 #include <DFRobotDFPlayerMini.h>
@@ -14,60 +22,58 @@
 #define WHITE 0xFFFF
 #define GREY 0xC638
 
-#define PS_WIDTH 320
-#define PS_HEIGHT 240
-// All the coordinates for the buttons are top left
-// play button data
-// X,Y of the play button centered
-#define PB_X 200
-#define PB_Y 20
-#define PB_W 80
-#define PB_H 80
-// location of reverse and forward
-#define PS_REVERSE_X 160
-#define PS_REVERSE_Y 100
-#define PS_REVERSE_W 80
-#define PS_REVERSE_H 30
+#define SCREEN_W 320
+#define SCREEN_H 240
 
-#define PS_FORWARD_X 240
-#define PS_FORWARD_Y 100
-#define PS_FORWARD_W 80
-#define PS_FORWARD_H 30
-// location of the volume controls and loop controls
-#define PS_VOLDOWN_X 160
-#define PS_VOLDOWN_Y 140
-#define PS_VOLUP_X 270
-#define PS_VOLUP_Y 140
-#define PS_VOL_W 50
-#define PS_VOL_H 30
+// location of play button
+#define PLAY_X 200
+#define PLAY_Y 20
+#define PLAY_W 80
+#define PLAY_H 80
 
-#define PS_LOOP_X 210
-#define PS_LOOP_Y 140
-#define PS_LOOP_W 60
-#define PS_LOOP_H 30
+// location of reverse and forward buttons
+#define REV_X 160
+#define REV_Y 100
+#define FRW_X 240
+#define FRW_Y 100
+#define FR_W 80
+#define FR_H 30
+
+// location of the volume controls
+#define VOLDOWN_X 160
+#define VOLDOWN_Y 140
+#define VOLUP_X 270
+#define VOLUP_Y 140
+#define VOL_W 50
+#define VOL_H 30
+
+// location of loop button
+#define LOOP_X 210
+#define LOOP_Y 140
+#define LOOP_W 60
+#define LOOP_H 30
+
 // height of the song progress bar
-#define PBAR_H 10
-#define PBAR_Y 225
+#define PROGBAR_H 10
+#define PROGBAR_Y 225
 
 // album image size
-#define ALBUM_W 150
-#define ALBUM_H 150
+#define ICON_X 10
+#define ICON_Y 20
+#define ICON_W 150
+#define ICON_H 150
 
-// distance from the top and left edge of the tft to the album
-#define ALBUM_PADDING_TOP 20
-#define ALBUM_PADDING_LEFT 10
+#define VOLBAR_Y 8
+#define VOLBAR_H 4
+#define VOLBAR_UNIT 11
 
-#define VOLUMEBAR_Y 8
-#define VOLUMEBAR_H 4
-#define VOLUMEBAR_UNIT_WIDTH 11
-#define VOLUMEBAR_DELAY 200
+// music info on screen location
+#define TEXTBOX_H 50
+#define TEXT_MAX 44
 
-// position of the text CENTER
-#define TEXT_X 160
-#define TEXT_Y 215
-
-// characters are 6x8 pixels.The following will change the scale
-#define TEXT_SCALE 2
+#define TITLE_Y 192
+#define ARTIST_Y 212
+#define ALBUM_Y 224
 
 // the state of the touch will always be one of the following
 // changes will be made on button up (B_UP) only
@@ -77,14 +83,24 @@
 #define B_UP 3
 
 // adafruit_ILI9341 *tft;
-PlayScreen::PlayScreen(Adafruit_ILI9341* tft, DFRobotDFPlayerMini* musicPlayer){
+PlayScreen::PlayScreen(Adafruit_ILI9341* tft, DFRobotDFPlayerMini* musicPlayer,\
+	uint32_t index){
+
 	this->tft = tft;
 	this->musicPlayer = musicPlayer;
+
 	this->isPlaying = true;
 	this->isLooping = false;
+
 	this->index = index;
-	this->delay = 0;
-	
+	this->title = "";
+	this->artist = "";
+	this->album = "";
+	this->songLen = 0;
+
+	this->volume = this->musicPlayer.readVolume();
+	this->volDelay = 0;
+
 	this->draw();
 }
 
@@ -94,94 +110,96 @@ PlayScreen::PlayScreen(Adafruit_ILI9341* tft){
 
 // this function takes in the x,y,value of the center of the button and the radius
 // also takes in the state which is pressed or not pressed
-void PlayScreen::handleTouch(uint16_t tx, uint16_t ty, int state){
-	//only do something if touch was detected
+bool PlayScreen::handleTouch(uint16_t tx, uint16_t ty, int state){
+	bool checkVar = false;
+	// only do something if touch was detected
 	if(state == B_UP){
-		//if the play button is touched, change the image of the button
-		if(isTouched(tx,ty,PB_X,PB_Y,PB_W,PB_H)){
+		// if the play button is touched, change the image of the button
+		if(isTouched(tx, ty, PLAY_X, PLAY_Y, PLAY_W, PLAY_H)){
 			onPlayClick();
 		}
-		//check if the looping button is pressed
-		else if(isTouched(tx,ty,PS_LOOP_X,PS_LOOP_Y,PS_LOOP_W,PS_LOOP_H)){
+		// check if the looping button is pressed
+		else if(isTouched(tx, ty, LOOP_X, LOOP_Y, LOOP_W, LOOP_H)){
 			onLoopClick();
 		}
-		else if(isTouched(tx,ty,PS_FORWARD_X,PS_FORWARD_Y,PS_FORWARD_W,PS_FORWARD_H)){
+		else if(isTouched(tx, ty, FRW_X, FRW_Y, FR_W, FR_H)){
 			onForwardClick();
 		}
-		else if(isTouched(tx,ty,PS_REVERSE_X,PS_REVERSE_Y,PS_REVERSE_W,PS_REVERSE_H)){
+		else if(isTouched(tx, ty, REV_X, REV_Y, FR_W, FR_H)){
 			onReverseClick();
 		}
-		else if(isTouched(tx,ty,ALBUM_PADDING_LEFT,ALBUM_PADDING_TOP,ALBUM_W,ALBUM_H)){
-			onAlbumClick();
+		else if(isTouched(tx, ty, ICON_X, ICON_Y, ICON_W, ICON_H)){
+			onIconClick();
+			checkVar = true;
 		}
-		else if(isTouched(tx,ty,0,PBAR_Y,PS_WIDTH,PBAR_H)){
-			onProgressBarClick((tx)/(PS_WIDTH)*100);
+		else if(isTouched(tx,ty,0,PROGBAR_Y,SCREEN_W,PROGBAR_H)){
+			onProgressBarClick((tx)/(SCREEN_W)*100);
 		}
 
 
 	}
-	//for the volume button, we do not want to wait for the buttonUp event
-	//simply pressing the screen should change the volume
+	// for the volume button, we do not want to wait for the buttonUp event
+	// simply pressing the screen should change the volume
 	else if(state == PRESSED){
-		if(isTouched(tx,ty,PS_VOLUP_X,PS_VOLUP_Y,PS_VOL_W,PS_VOL_H)){
+		if(isTouched(tx,ty,VOLUP_X,VOLUP_Y,VOL_W,VOL_H)){
 			onVolUpClick();
 		}
-		if(isTouched(tx,ty,PS_VOLDOWN_X,PS_VOLDOWN_Y,PS_VOL_W,PS_VOL_H)){
+		if(isTouched(tx,ty,VOLDOWN_X,VOLDOWN_Y,VOL_W,VOL_H)){
 			onVolDownClick();
 		}
 	}
 	drawProgressBar(5);
+	return checkVar;
 
 }
 
 void PlayScreen::drawProgressBar(int progress){
-	// draws the progress bar for the song. progress is a percentage i.e. a integer from 0 to 100
-	this->tft->fillRect(0,PBAR_Y, PS_WIDTH*progress/100, PBAR_H, RED);
+	// draws the progress bar for the song respective to current play time
+	this->tft->fillRect(0,PROGBAR_Y, SCREEN_W*progress/100, PROGBAR_H, RED);
 }
 
-void PlayScreen::drawAlbum(){
-	// draws the album cover. currently just draw a square
-	this->tft->fillRect(ALBUM_PADDING_LEFT, ALBUM_PADDING_TOP, ALBUM_W, ALBUM_H, GREY);
+// draw the album art
+void PlayScreen::drawIcon(){
+	this->tft->fillRect(ICON_X, ICON_Y, ICON_W, ICON_H, GREY);
 }
 
-void PlayScreen::drawInfo(const char* title,int len){
-	this->tft->setCursor(TEXT_X-len*6*TEXT_SCALE/2, TEXT_Y-8*TEXT_SCALE/2);
-	this->tft->setTextColor(RED);
-	this->tft->setTextSize(TEXT_SCALE);
-	this->tft->print(title);
-}
+
 void PlayScreen::drawVolumeBar(){
-	this->tft->fillRect(0,VOLUMEBAR_Y,PS_WIDTH,VOLUMEBAR_H,WHITE);
-	this->tft->fillRect(0,VOLUMEBAR_Y,VOLUMEBAR_UNIT_WIDTH*(this->volume),VOLUMEBAR_H,GREY);
+	this->tft->fillRect(0,VOLBAR_Y,SCREEN_W,VOLBAR_H,WHITE);
+	this->tft->fillRect(0,VOLBAR_Y,VOLBAR_UNIT*(this->volume),VOLBAR_H,GREY);
 }
+
+// sets buttons at initialization
 void PlayScreen::draw(){
-	//does all the drawing at the start
 	this->tft->fillScreen(WHITE);
 	this->drawProgressBar(0);
-	this->drawInfo("Taylor Swift - Mine",19);
-	this->drawAlbum();
-	//draw all the buttons
-	bmpDraw("/icons/pause.bmp",this->tft,PB_X,PB_Y);
-	bmpDraw("/icons/repeat.bmp",this->tft,PS_LOOP_X,PS_LOOP_Y);
-	bmpDraw("/icons/forward.bmp",this->tft,PS_FORWARD_X,PS_FORWARD_Y);
-	bmpDraw("/icons/reverse.bmp",this->tft,PS_REVERSE_X,PS_FORWARD_Y);
-	bmpDraw("/icons/volup.bmp",this->tft,PS_VOLUP_X,PS_VOLUP_Y);
-	bmpDraw("/icons/voldown.bmp",this->tft,PS_VOLDOWN_X,PS_VOLDOWN_Y);
+	this->drawIcon();
+
+	// draw all the buttons
+	bmpDraw("/icons/pause.bmp", this->tft, PLAY_X, PLAY_Y);
+	bmpDraw("/icons/repeat.bmp", this->tft, LOOP_X, LOOP_Y);
+	bmpDraw("/icons/forward.bmp", this->tft, FRW_X, FRW_Y);
+	bmpDraw("/icons/reverse.bmp", this->tft, REV_X, FRW_Y);
+	bmpDraw("/icons/volup.bmp", this->tft, VOLUP_X, VOLUP_Y);
+	bmpDraw("/icons/voldown.bmp", this->tft, VOLDOWN_X, VOLDOWN_Y);
+
+	this->setInfo();
 }
+
+// checks for touch for various buttons/icons using button/icon location
 bool PlayScreen::isTouched(int tx, int ty, int x, int y, int w, int h){
-	//touch collision check
-	return (tx> x&& tx<(x+w))&&(ty>y && ty<(y+h));
+	return (tx> x && tx < (x+w))&&(ty > y && ty < (y+h));
 }
 //all of the different on click functions below
 void PlayScreen::onPlayClick(){
 	if(this->isPlaying){
 				//if music was currently playing, we want to change the state to paused
 				this->isPlaying = false;
-				bmpDraw("/icons/pause.bmp",this->tft,PB_X,PB_Y);
+				bmpDraw("/icons/pause.bmp",this->tft,PLAY_X,PLAY_Y);
 			}else{
 				//if music was paused, unpause and redraw
 				this->isPlaying = true;
-				bmpDraw("/icons/play.bmp",this->tft,PB_X,PB_Y);
+				bmpDraw("/icons/play.bmp",this->tft,PLAY_X,PLAY_Y);
 			}
 }
 void PlayScreen::onForwardClick(){
@@ -194,35 +212,35 @@ void PlayScreen::onReverseClick(){
 void PlayScreen::onLoopClick(){
 	if(this->isLooping){
 			this->isLooping = false;
-			bmpDraw("/icons/repeat.bmp",this->tft,PS_LOOP_X,PS_LOOP_Y);
+			bmpDraw("/icons/repeat.bmp",this->tft,LOOP_X,LOOP_Y);
 		}else{
 			this->isLooping = true;
-			bmpDraw("/icons/repeat1.bmp",this->tft,PS_LOOP_X,PS_LOOP_Y);
+			bmpDraw("/icons/repeat1.bmp",this->tft,LOOP_X,LOOP_Y);
 
 		}
 }
 void PlayScreen::onVolUpClick(){
 	//if the time since the last press is long enough, change volume
-	if(millis()-(this->delay) > VOLUMEBAR_DELAY){
-		this->delay = millis();
+	if(millis() - (this->volDelay) > 250){
 		if(this->volume < 30){
 		(this->volume)++;
 		}
 		this->drawVolumeBar();
+		this->volDelay = millis();
 	}
 
 }
 void PlayScreen::onVolDownClick(){
-	if(millis()-(this->delay) > VOLUMEBAR_DELAY){
-		this->delay = millis();
+	if(millis()-(this->volDelay) > 250){
 		if(this->volume > 0){
 			(this->volume)--;
 		}
 		this->drawVolumeBar();
+		this->volDelay = millis();
 	}
 
 }
-void PlayScreen::onAlbumClick(){
+void PlayScreen::onIconClick(){
 	Serial.print("Album");
 	Serial.flush();
 }

@@ -19,9 +19,7 @@ private:
 	void drawAlbum(uint32_t index);
 	void setAlbums(int maxIndex);
 
-	uint8_t getIndex();
 	void setIndex(uint32_t index);
-
 
 	void printTitle(String title);
 	void printArtist(String title);
@@ -37,6 +35,7 @@ public:
 	String getTitle();
 	String getArtist();
 	String getAlbum();
+	uint32_t getIndex();
 
 	bool handleTouch(uint16_t tx, uint16_t ty);
 };

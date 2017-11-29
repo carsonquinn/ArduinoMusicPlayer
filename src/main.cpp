@@ -35,8 +35,9 @@ void setup(){
 	while(true) { };
 	}
 
+	// don't start too loud
 	Serial.println("DFPlayer online");
-	musicPlayer.volume(30);
+	musicPlayer.volume(14);
 
 	// must come before SD.begin() ...
 	tft.begin();
@@ -69,8 +70,6 @@ int main(){
 	PlayScreen ps = PlayScreen(&tft);
 	Touch touch = Touch();
 
-  	musicPlayer.play(11);
-
   	while(true){
 		// code for Boot screen
 		if (state == BOOT){
@@ -99,7 +98,7 @@ int main(){
 
 		// code to transition to Play Screen
 		} else if (state == SELECT_TO_PLAY){
-			ps = PlayScreen(&tft, &musicPlayer);
+			ps = PlayScreen(&tft, &musicPlayer, ss.getIndex());
 			state = PLAY;
 
 		// run PlayScreen code

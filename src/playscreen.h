@@ -21,7 +21,7 @@ private:
 	float songLen;
 
 	//time since the volume has changed
-	int delay;
+	int volDelay;
 
 	void onPlayClick();
 	void onForwardClick();
@@ -29,22 +29,21 @@ private:
 	void onLoopClick();
 	void onVolUpClick();
 	void onVolDownClick();
-	void onAlbumClick();
+	void onIconClick();
 	void onProgressBarClick(int percentage);
 
 	void draw();
 	void drawVolumeBar();
 	void drawProgressBar(int progress);
-	void drawAlbum();
-	void drawInfo(const char* title,int len);
+	void drawIcon();
 
 	bool isTouched(int tx, int ty, int x, int y, int w, int h);
 
 public:
  	PlayScreen(Adafruit_ILI9341* tft);
-	PlayScreen(Adafruit_ILI9341* tft, DFRobotDFPlayerMini* musicPlayer);
+	PlayScreen(Adafruit_ILI9341* tft, DFRobotDFPlayerMini* musicPlayer, uint32_t index);
 
-	void handleTouch(uint16_t tx, uint16_t ty, int state);
+	bool handleTouch(uint16_t tx, uint16_t ty, int state);
 
 };
 #endif
