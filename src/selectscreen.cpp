@@ -214,9 +214,14 @@ void SelectScreen::setInfo(uint32_t index){
 
 	if (index < 9){
 		ind = String("000") + String(index+1);
-	}else{
+	} else if (index < 99){
 		ind = String("00") + String(index+1);
+	} else if (index < 999){
+		ind = String("0") + String(index+1);
+	} else {
+		ind = String(index+1);
 	}
+
 
 	path = path + ind + String(".txt");
 

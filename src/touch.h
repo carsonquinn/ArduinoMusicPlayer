@@ -15,8 +15,10 @@ public:
 	bool isButtonDown();
 	bool isButtonUp();
 
-	int getX();
-	int getY();
+	uint16_t getX();
+	uint16_t getY();
+	int getState();
+
 };
 
 #endif

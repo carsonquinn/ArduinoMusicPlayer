@@ -15,6 +15,7 @@ private:
 
 	// song variables
 	uint32_t index;
+	uint32_t maxIndex;
 	String title;
 	String artist;
 	String album;
@@ -33,7 +34,7 @@ private:
 
 	void draw();
 	void drawVolumeBar(uint8_t volume);
-	void drawProgressBar(int progress);
+	void drawProgressBar(uint8_t progress);
 	void drawIcon(uint32_t index);
 
 	void setInfo(uint32_t index);

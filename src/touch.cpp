@@ -85,10 +85,14 @@ bool Touch::isButtonUp(){
 	return this->state == B_UP;
 }
 
-int Touch::getX(){
+uint16_t Touch::getX(){
 	return this->tx;
 }
 
-int Touch::getY(){
+uint16_t Touch::getY(){
 	return this->ty;
+}
+
+int Touch::getState(){
+	return this->state;
 }

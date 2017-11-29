@@ -98,12 +98,25 @@ int main(){
 
 		// code to transition to Play Screen
 		} else if (state == SELECT_TO_PLAY){
-			ps = PlayScreen(&tft, &musicPlayer, ss.getIndex());
+			ps = PlayScreen(&tft, &musicPlayer, ss.getIndex(), musicPlayer.readFileCounts()/2);
 			state = PLAY;
 
 		// run PlayScreen code
 		} else if (state == PLAY){
+			// get touch and pass params to playscreen to handle it
+			touch.processTouch();
+			bool move = false;
+			move = ps.handleTouch(touch.getX(), touch.getY(), touch.getState());
+			// the touch handler for class returns true if state change
+			// action has been processed
+			if (move){
+				state = PLAY_TO_SELECT;
+			}
 
+		// code to transition back to SelectScreen
+		} else if (state == PLAY_TO_SELECT){
+			ss = SelectScreen(&tft, musicPlayer.readFileCounts()/2);
+			state = SELECT;
 		}
   	}
 
