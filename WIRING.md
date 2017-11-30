@@ -9,7 +9,7 @@ library doesn't allow for MicroSD reads, it just takes music function requests o
 to display my GUI and hence the second MicroSD is necessary. It shouldn't be too hard to edit DF Robot's library though
 since I believe they're using the standard SD and SPI libraries too but if not, you can implement that.
 I'll link all the libraries I used (for touchscreen and DFPlayer) in my [README](https://github.com/dandua98/ArduinoMusicPlayer/blob/master/README.md "README.md"). For my speaker, I used
-Gikfun's [5W EK1688](https://www.amazon.ca/Gikfun-Speaker-Stereo-Woofer-Arduino/dp/B0154KLTNM/ref=sr_1_1?ie=UTF8&qid=1511999750&sr=8-1&keywords=gikfun+speaker "Gikfun 2" 8 Ohm 5W Audio..."). DFPlayer's documentation says it can only power speakers less than 3W but this one worked perfectly!
+Gikfun's [5W EK1688](https://www.amazon.ca/Gikfun-Speaker-Stereo-Woofer-Arduino/dp/B0154KLTNM/ref=sr_1_1?ie=UTF8&qid=1511999750&sr=8-1&keywords=gikfun+speaker "Gikfun 2 8 Ohm 5W Audio..."). DFPlayer's documentation says it can only power speakers less than 3W but this one worked perfectly!
 
 ## Hardware
 
@@ -30,7 +30,7 @@ Gikfun's [5W EK1688](https://www.amazon.ca/Gikfun-Speaker-Stereo-Woofer-Arduino/
 _Sketch made using [Fritzing](http://fritzing.org/home/ "Fritzing") open source schematic software_
 
 #### For DFPlayer Mini:
-![Wiring](https://www.dfrobot.com/wiki/images/a/ab/Miniplayer_pin_map.png "DFPlayer Mini")<br/>
+![Wiring](https://github.com/dandua98/ArduinoMusicPlayer/raw/master/common/images/dfplayer.png "DFPlayer Mini")<br/>
 _Schematic from DFPlayer Mini wiki_<br/>
 
 | DFPlayer Mini Pin| Arduino Pin|
