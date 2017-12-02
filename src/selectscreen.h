@@ -26,7 +26,7 @@ private:
 	void printAlbum(String title);
 
 	void setInfo(uint32_t index);
-	uint8_t handleAlbumTouch(uint16_t tx, uint16_t ty);
+	uint8_t handleAlbumTouch(int tx, int ty);
 
 public:
 	SelectScreen(Adafruit_ILI9341* tft, uint32_t maxIndex);
@@ -37,6 +37,6 @@ public:
 	String getAlbum();
 	uint32_t getIndex();
 
-	bool handleTouch(uint16_t tx, uint16_t ty);
+	bool handleTouch(int tx, int ty);
 };
 #endif

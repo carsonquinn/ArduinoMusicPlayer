@@ -4,9 +4,9 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_ILI9341.h>
 #include <DFRobotDFPlayerMini.h>
-#include "playscreen.h"
-#include "selectscreen.h"
 #include "boot.h"
+#include "selectscreen.h"
+#include "playscreen.h"
 #include "touch.h"
 
 // TFT SD includes all the image files for
@@ -15,6 +15,9 @@
 #define TFT_DC 9
 #define TFT_CS 10
 #define TFT_SDCS 6
+
+#define SCREEN_W 320
+#define SCREEN_H 240
 
 // lcd screen and touch screen initialization, can set your own screen here
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
@@ -65,8 +68,8 @@ int main(){
 
 	// main objects for the screens and touch handler
 	// only Boot Screen is Initialized here, the rest are empty Initialized
-	SelectScreen ss = SelectScreen(&tft);
 	Boot boot = Boot(&tft);
+	SelectScreen ss = SelectScreen(&tft);
 	PlayScreen ps = PlayScreen(&tft);
 	Touch touch = Touch();
 
@@ -76,7 +79,7 @@ int main(){
 			touch.processTouch();
 			boot.animate(millis());
 			// change state on click anywhere on screen
-			if (touch.isButtonUp()){
+			if (touch.isButtonUp() && touch.getX() > 0 && touch.getY() > 0){
 				state = SELECT_SCREEN;
 				ss = SelectScreen(&tft, musicPlayer.readFileCounts()/2);
 			}
@@ -87,7 +90,7 @@ int main(){
 			// get touch, if button is released, handle touch
 			touch.processTouch();
 			bool move = false;
-			if (touch.isButtonUp()){
+			if (touch.isButtonUp() && (touch.getX() > 0) && (touch.getY() > 0)){
 				move = ss.handleTouch(touch.getX(), touch.getY());
 			}
 			// the touch handler for class returns true if state change
@@ -107,8 +110,10 @@ int main(){
 			touch.processTouch();
 			bool move = false;
 			ps.animate();
-			move = ps.handleTouch(touch.getX(), touch.getY(), touch.getState());
-			// the touch handler for class returns true if state change
+			if ((touch.getX() > 0) && (touch.getY() > 0)){
+				move = ps.handleTouch(touch.getX(), touch.getY(), touch.getState());
+			}
+			// the touch handler for this class returns true if state change
 			// action has been processed
 			if (move){
 				state = PLAY_TO_SELECT;

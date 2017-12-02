@@ -28,7 +28,7 @@
 #include <SD.h>
 #include <SPI.h>
 #include "boot.h"
-#include "bmp_disp.h"
+#include "bmpDisplay.h"
 
 // these definitons are for setting different margins and icons on screen.
 // They're set for a 320*240 tft screen. Will need to change according

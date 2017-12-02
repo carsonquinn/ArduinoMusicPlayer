@@ -27,7 +27,7 @@
 #include <DFRobotDFPlayerMini.h>
 #include <SPI.h>
 #include <SD.h>
-#include "bmp_disp.h"
+#include "bmpDisplay.h"
 #include "playscreen.h"
 
 #define BLACK 0x0000
@@ -134,7 +134,7 @@ PlayScreen::PlayScreen(Adafruit_ILI9341* tft){
 
 // takes the touch position and state (Button up or Pressed) to
 // determine which icon was touched and calls touch handler functions
-bool PlayScreen::handleTouch(uint16_t tx, uint16_t ty, int state){
+bool PlayScreen::handleTouch(int tx, int ty, int state){
 	bool checkVar = false;
 	// for buttons that perform action on release
 	if(state == B_UP){

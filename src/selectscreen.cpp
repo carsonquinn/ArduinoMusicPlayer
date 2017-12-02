@@ -33,7 +33,7 @@
 #include <Adafruit_ILI9341.h> // Hardware-specific library
 #include <SPI.h>
 #include <SD.h>
-#include "bmp_disp.h"
+#include "bmpDisplay.h"
 #include "selectscreen.h"
 
 #define BLACK 0x0000
@@ -306,38 +306,37 @@ void SelectScreen::printAlbum(String title){
 
 // handles touch event and returns true if screen needs to move from
 // select to play
-bool SelectScreen::handleTouch(uint16_t tx, uint16_t ty){
+bool SelectScreen::handleTouch(int tx, int ty){
+	bool checkVar = false;
 	// the extremeties are handled inside setAlbums
+	// left icon clicked
 	if (tx < (ICON_ZX)){
 		int callIndex = this->currentMax - (this->currentMax % 6) - 1;
 		this->setAlbums(callIndex);
-		return false;
 
-	} else if (tx > SCREEN_W - (ICON_ZX)){
-		// the higher than expected extreme would be handles inside setAlbums
+	// the higher than expected extreme would be handles inside setAlbums
+	// right icon clicked
+	} else if ((tx > SCREEN_W - ICON_ZX) && (ty < SCREEN_H)){
 		int callIndex = this->currentMax + 6;
 		this->setAlbums(callIndex);
-		return false;
 
-	} else if (ty < SCREEN_H - TEXTBOX_H){
+	} else if ((ty < SCREEN_H - TEXTBOX_H) && (tx < SCREEN_W)){
 		// get index of album if an album was touched
 		uint8_t touchedIndex = this->handleAlbumTouch(tx, ty);
 		if (touchedIndex == this->index){
-			return true;
+			checkVar = true;
 
 		}else if (touchedIndex <= this->maxIndex){
 			this->setIndex(touchedIndex);
 			// small delay prevents multi-touch
 			delay(500);
-			return false;
-			
-		}else{
-			return false;
 		}
 	}
+	return checkVar;
+
 }
 
-uint8_t SelectScreen::handleAlbumTouch(uint16_t tx, uint16_t ty){
+uint8_t SelectScreen::handleAlbumTouch(int tx, int ty){
 	uint8_t index = this->currentMax - (this->currentMax % 6);
 	// increase index by 1 if it's in bottom row
 	if (ty > MARGIN_TB + ICON_H + MARGIN_ROW/2){

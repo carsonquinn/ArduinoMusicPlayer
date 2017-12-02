@@ -14,7 +14,7 @@
 #define TS_MAXX 900
 #define TS_MAXY 940
 
-#define MINPRESSURE 100
+#define MINPRESSURE 50
 #define MAXPRESSURE 1000
 
 #define TH_WIDTH 320
@@ -43,26 +43,25 @@ void Touch::processTouch(){
 		// this is called when the user is not touching the screen
 			if (this->state == B_DOWN){
 				this->state = B_UP;
-			}else if(this->state == B_UP){
+			} else if(this->state == B_UP){
 				this->state = NO_TOUCH;
-			}else if(this->state == PRESSED){
+			} else if(this->state == PRESSED){
 				this->state = B_UP;
 			}
-			return;
 			// exit loop if there is no touch
-	}
+			return;
 
-	if (this->state == NO_TOUCH){
+	} else if (this->state == NO_TOUCH){
 		this->state = B_DOWN;
-	}else if (this->state == B_DOWN){
+	} else if (this->state == B_DOWN){
 		this->state = PRESSED;
-	}else if (this->state == B_UP){
+	} else if (this->state == B_UP){
 		this->state = B_DOWN;
 	}
 
 	// Scale from 0->1000 to tft.width using the calibration #'s
-	p.x = map(p.x, TS_MINX, TS_MAXX, 0, TH_HEIGHT);
-	p.y = map(p.y, TS_MINY, TS_MAXY, 0, TH_WIDTH);
+	p.x = map(p.x, TS_MINX, TS_MAXX, 0, TH_HEIGHT - 1);
+	p.y = map(p.y, TS_MINY, TS_MAXY, 0, TH_WIDTH - 1);
 
 	// px and py are the coordinates of the touch if the screen was in vertical orientation.
 	// Convert the coordinates to horizontal coordinates for our purpose
@@ -85,11 +84,11 @@ bool Touch::isButtonUp(){
 	return this->state == B_UP;
 }
 
-uint16_t Touch::getX(){
+int Touch::getX(){
 	return this->tx;
 }
 
-uint16_t Touch::getY(){
+int Touch::getY(){
 	return this->ty;
 }
 

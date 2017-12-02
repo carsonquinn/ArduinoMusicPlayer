@@ -4,8 +4,8 @@
   made to fit our purposes
  */
 
-#ifndef _BMP_DISP_H
-#define _BMP_DISP_H
+#ifndef _BMP_DISPLAY_H
+#define _BMP_DISPLAY_H
 
 // file read functions don't need to declared here,
 // they're used in the cpp file anyway

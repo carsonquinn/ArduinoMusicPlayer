@@ -8,8 +8,7 @@
 #include "Adafruit_ILI9341.h" // Hardware-specific library
 #include <SPI.h>
 #include <SD.h>
-
-#include "bmp_disp.h"
+#include "bmpDisplay.h"
 
 #define BUFFPIXEL 20
 

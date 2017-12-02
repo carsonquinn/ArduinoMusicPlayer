@@ -53,7 +53,7 @@ public:
 	PlayScreen(Adafruit_ILI9341* tft, DFRobotDFPlayerMini* musicPlayer,\
 		 uint32_t index, uint32_t maxIndex);
 
-	bool handleTouch(uint16_t tx, uint16_t ty, int state);
+	bool handleTouch(int tx, int ty, int state);
 	void animate( );
 
 };
