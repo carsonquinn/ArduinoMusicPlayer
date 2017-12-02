@@ -100,37 +100,30 @@
 
 // adafruit_ILI9341 *tft;
 PlayScreen::PlayScreen(Adafruit_ILI9341* tft, DFRobotDFPlayerMini* musicPlayer,\
-	uint32_t index, uint32_t maxIndex){
+	uint32_t index, uint32_t maxIndex) : _tft(tft), _musicPlayer(musicPlayer),
+	_index(index), _maxIndex(maxIndex - 1) {
 
-	this->tft = tft;
-	this->musicPlayer = musicPlayer;
+	_isPlaying = true;
+	_isLooping = false;
 
-	this->isPlaying = true;
-	this->isLooping = false;
+	// sets to empty string anyway
+	_title = _artist = _album = "";
+	_songLen = 0;
 
-	this->index = index;
-	this->maxIndex = maxIndex - 1;
-	this->title = "";
-	this->artist = "";
-	this->album = "";
-	this->songLen = 0;
-
-	this->volume = this->musicPlayer->readVolume();
+	_volume = _musicPlayer->readVolume();
 	// would sync on volume press anyway
-	this->volDelay = millis();
+	_volDelay = millis();
 
-	this->setInfo(index);
-	this->draw();
+	setInfo(index);
+	drawScreen();
 
 	// music index is 2*index + 1 plus screen index
-	this->musicPlayer->play(2*index + 1);
-	this->startTime = millis();
-	this->lastAnimate = millis();
+	_musicPlayer->play(2*index + 1);
+	_startTime = _lastAnimate = millis();
 }
 
-PlayScreen::PlayScreen(Adafruit_ILI9341* tft){
-	this->tft = tft;
-}
+// default initialization
+PlayScreen::PlayScreen() { }
 
 // takes the touch position and state (Button up or Pressed) to
 // determine which icon was touched and calls touch handler functions
@@ -203,64 +196,64 @@ void PlayScreen::setInfo(uint32_t index){
 
 		// set field variables accordingly
 		if(f_setter == "song"){
-			this->title = f_variable;
+			_title = f_variable;
 		}else if(f_setter == "artist"){
-			this->artist = f_variable;
+			_artist = f_variable;
 		}else if(f_setter == "album"){
-			this->album = f_variable;
+			_album = f_variable;
 		}else if(f_setter == "time"){
 			char buffer[f_variable.length()];
 			f_variable.toCharArray(buffer, f_variable.length());
-			this->songLen = atof(buffer);
+			_songLen = atof(buffer);
 		}
 	}
 }
 
 // set title on the screen while handling text centering
 void PlayScreen::printTitle(String title){
-	this->tft->fillRect(TSIDE_W, TITLE_Y, SCREEN_W - 2*TSIDE_W, TEXTBOX_H, WHITE);
+	_tft->fillRect(TSIDE_W, TITLE_Y, SCREEN_W - 2*TSIDE_W, TEXTBOX_H, WHITE);
 
-	this->tft->setTextColor(RED);
-	this->tft->setTextSize(2);
+	_tft->setTextColor(RED);
+	_tft->setTextSize(2);
 	if (title.length() > TEXT_MAX/2){
 		title = title.substring(0, TEXT_MAX/2 - 3) + String("...");
 	}
-	this->tft->setCursor(SCREEN_W/2 - (title.length()/2)*12, TITLE_Y);
-	this->tft->print(title);
+	_tft->setCursor(SCREEN_W/2 - (title.length()/2)*12, TITLE_Y);
+	_tft->print(title);
 }
 
 // set artist on the screen
 void PlayScreen::printArtist(String title){
-	this->tft->setTextColor(RED);
-	this->tft->setTextSize(1);
-	if (title.length()>TEXT_MAX){
-		title = title.substring(0, TEXT_MAX - 3) + String("...");
-	}
-	this->tft->setCursor(SCREEN_W/2 - (title.length()/2)*6, ARTIST_Y);
-	this->tft->print(title);
+	_tft->setTextColor(RED);
+	_tft->setTextSize(1);
+		if (title.length()>TEXT_MAX){
+			title = title.substring(0, TEXT_MAX - 3) + String("...");
+		}
+	_tft->setCursor(SCREEN_W/2 - (title.length()/2)*6, ARTIST_Y);
+	_tft->print(title);
 }
 
 // set album on the screen
 void PlayScreen::printAlbum(String title){
-	this->tft->setTextColor(RED);
-	this->tft->setTextSize(1);
-	if (title.length()>TEXT_MAX){
-		title = title.substring(0,TEXT_MAX-3) + String("...");
-	}
-	this->tft->setCursor(SCREEN_W/2 - (title.length()/2)*6, ALBUM_Y);
-	this->tft->print(title);
+	_tft->setTextColor(RED);
+	_tft->setTextSize(1);
+		if (title.length()>TEXT_MAX){
+			title = title.substring(0,TEXT_MAX-3) + String("...");
+		}
+	_tft->setCursor(SCREEN_W/2 - (title.length()/2)*6, ALBUM_Y);
+	_tft->print(title);
 }
 
 // draws the progress bar for the song respective to current play time
 // progress is in percent and is calculated when the function is called
 // at animate
 void PlayScreen::drawProgressBar(float progress){
-	this->tft->fillRect(0, PROGBAR_Y, (SCREEN_W*progress)/100, PROGBAR_H, RED);
+	_tft->fillRect(0, PROGBAR_Y, (SCREEN_W*progress)/100, PROGBAR_H, RED);
 }
 
 // resetting progress bar to 0
 void PlayScreen::resetProgressBar(){
-	this->tft->fillRect(0, PROGBAR_Y, SCREEN_W, PROGBAR_H, WHITE);
+	_tft->fillRect(0, PROGBAR_Y, SCREEN_W, PROGBAR_H, WHITE);
 }
 
 // draw the album art
@@ -281,49 +274,52 @@ void PlayScreen::drawIcon(uint32_t index){
 	char charBuffer[path.length() + 1];
 	path.toCharArray(charBuffer, path.length() + 1);
 
-	bmpDraw(charBuffer, this->tft, ICON_X, ICON_Y);
+	bmpDraw(charBuffer, _tft, ICON_X, ICON_Y);
 }
 
 // draw volume bar corresponding to current volume
 void PlayScreen::drawVolumeBar(uint8_t volume){
-	this->tft->fillRect(0, VOLBAR_Y, SCREEN_W, VOLBAR_H, WHITE);
-	this->tft->fillRect(0, VOLBAR_Y, VOLBAR_UNIT*volume, VOLBAR_H, GREY);
+	_tft->fillRect(0, VOLBAR_Y, SCREEN_W, VOLBAR_H, WHITE);
+	_tft->fillRect(0, VOLBAR_Y, VOLBAR_UNIT*volume, VOLBAR_H, GREY);
 }
 
 // sets buttons at initialization
-void PlayScreen::draw(){
-	this->tft->fillScreen(WHITE);
-	this->resetProgressBar();
-	this->drawVolumeBar(this->volume);
-	this->drawIcon(this->index);
+void PlayScreen::drawScreen(){
+	_tft->fillScreen(WHITE);
+	resetProgressBar();
+	drawVolumeBar(_volume);
+	drawIcon(_index);
 
 	// draw all the buttons
-	bmpDraw("/icons/pause.bmp", this->tft, PLAY_X, PLAY_Y);
-	bmpDraw("/icons/repeat.bmp", this->tft, LOOP_X, LOOP_Y);
-	bmpDraw("/icons/forward.bmp", this->tft, FRW_X, FRW_Y);
-	bmpDraw("/icons/reverse.bmp", this->tft, REV_X, FRW_Y);
-	bmpDraw("/icons/volup.bmp", this->tft, VOLUP_X, VOLUP_Y);
-	bmpDraw("/icons/voldown.bmp", this->tft, VOLDOWN_X, VOLDOWN_Y);
+	bmpDraw("/icons/pause.bmp", _tft, PLAY_X, PLAY_Y);
+	bmpDraw("/icons/repeat.bmp", _tft, LOOP_X, LOOP_Y);
+	bmpDraw("/icons/forward.bmp", _tft, FRW_X, FRW_Y);
+	bmpDraw("/icons/reverse.bmp", _tft, REV_X, FRW_Y);
+	bmpDraw("/icons/volup.bmp", _tft, VOLUP_X, VOLUP_Y);
+	bmpDraw("/icons/voldown.bmp", _tft, VOLDOWN_X, VOLDOWN_Y);
 
-	this->printTitle(this->title);
-	this->printArtist(this->artist);
-	this->printAlbum(this->album);
+	printTitle(_title);
+	printArtist(_artist);
+	printAlbum(_album);
 }
 
 // moves progress bar
 void PlayScreen::animate( ){
-	if (this->isPlaying && (millis() - this->lastAnimate) > 1000){
-		unsigned long runTime = millis() - this->startTime;
-		float progress = (float)runTime/(float)(this->songLen*1000);
-		if (progress >= 0.99 && this->isLooping){
-			this->resetProgressBar();
+	if (_isPlaying && (millis() - _lastAnimate) > 1000){
+
+		unsigned long runTime = millis() - _startTime;
+		float progress = (float)runTime/(float)(_songLen*1000);
+
+		if (progress >= 0.99 && _isLooping){
+			resetProgressBar();
 			progress = 0;
-			this->startTime = millis();
+			_startTime = millis();
+
 		} else if (progress >= 1){
 			progress = 1;
 		}
-		this->drawProgressBar(progress*100);
-		this->lastAnimate = millis();
+		drawProgressBar(progress*100);
+		_lastAnimate = millis();
 	}
 }
 
@@ -334,83 +330,83 @@ bool PlayScreen::isTouched(int tx, int ty, int x, int y, int w, int h){
 
 // on play click is used to play/pause music
 void PlayScreen::onPlayClick(){
-	if(this->isPlaying){
-				// if music was currently playing, we want to change the state to paused
-				this->isPlaying = false;
-				this->musicPlayer->pause();
-				this->pauseTime = millis();
-				bmpDraw("/icons/play.bmp", this->tft, PLAY_X, PLAY_Y);
-			}else{
-				//if music was paused, unpause and redraw
-				this->isPlaying = true;
-				this->musicPlayer->start();
-				this->startTime += millis() - this->pauseTime;
-				bmpDraw("/icons/pause.bmp", this->tft, PLAY_X, PLAY_Y);
-			}
+	if(_isPlaying){
+		// if music was currently playing, we want to change the state to paused
+		_isPlaying = false;
+		_musicPlayer->pause();
+		_pauseTime = millis();
+		bmpDraw("/icons/play.bmp", _tft, PLAY_X, PLAY_Y);
+	} else {
+		//if music was paused, unpause and redraw
+		_isPlaying = true;
+		_musicPlayer->start();
+		_startTime += millis() - _pauseTime;
+		bmpDraw("/icons/pause.bmp", _tft, PLAY_X, PLAY_Y);
+	}
 }
 
 // move to next song, reset loop, play, icon and titles
 void PlayScreen::onForwardClick(){
-	if (this->index < this->maxIndex){
-		this->musicPlayer->pause();
+	if (_index < _maxIndex){
+		_musicPlayer->pause();
 
-		this->index++;
-		this->isPlaying = true;
-		this->isLooping = false;
-		bmpDraw("/icons/repeat.bmp", this->tft, LOOP_X, LOOP_Y);
+		_index++;
+		_isPlaying = true;
+		_isLooping = false;
+		bmpDraw("/icons/repeat.bmp", _tft, LOOP_X, LOOP_Y);
 
 		// music info and drawing
-		this->setInfo(this->index);
-		this->resetProgressBar();
-		this->drawIcon(this->index);
-		this->printTitle(this->title);
-		this->printArtist(this->artist);
-		this->printAlbum(this->album);
+		setInfo(_index);
+		resetProgressBar();
+		drawIcon(_index);
+		printTitle(_title);
+		printArtist(_artist);
+		printAlbum(_album);
 
 		// play new song
-		this->musicPlayer->play(2*this->index + 1);
-		this->startTime = millis();
+		_musicPlayer->play(2*_index + 1);
+		_startTime = millis();
 	}
 }
 
 // move to previous song, reset loop, play, icon and titles
 void PlayScreen::onReverseClick(){
-	if (this->index > 0){
-		this->musicPlayer->pause();
+	if (_index > 0){
+		_musicPlayer->pause();
 
-		this->index--;
-		this->isPlaying = true;
-		this->isLooping = false;
-		bmpDraw("/icons/repeat.bmp", this->tft, LOOP_X, LOOP_Y);
+		_index--;
+		_isPlaying = true;
+		_isLooping = false;
+		bmpDraw("/icons/repeat.bmp", _tft, LOOP_X, LOOP_Y);
 
 		// music info and drawing
-		this->setInfo(this->index);
-		this->resetProgressBar();
-		this->drawIcon(this->index);
-		this->printTitle(this->title);
-		this->printArtist(this->artist);
-		this->printAlbum(this->album);
+		setInfo(_index);
+		resetProgressBar();
+		drawIcon(_index);
+		printTitle(_title);
+		printArtist(_artist);
+		printAlbum(_album);
 
 		// play new song
-		this->musicPlayer->play(2*this->index + 1);
-		this->startTime = millis();
+		_musicPlayer->play(2*_index + 1);
+		_startTime = millis();
 	}
 
 }
 
 // set/disable loop for current song
 void PlayScreen::onLoopClick(){
-	if(this->isLooping){
-			this->isLooping = false;
-			this->musicPlayer->disableLoop();
-			bmpDraw("/icons/repeat.bmp", this->tft, LOOP_X, LOOP_Y);
+	if(_isLooping){
+			_isLooping = false;
+			_musicPlayer->disableLoop();
+			bmpDraw("/icons/repeat.bmp", _tft, LOOP_X, LOOP_Y);
 		}else{
 			// sets red looping icon on setting loop to true
-			this->isLooping = true;
-			this->musicPlayer->loop(2*index + 1);
-			this->resetProgressBar();
-			this->startTime = millis();
-			bmpDraw("/icons/repeatR.bmp", this->tft, LOOP_X, LOOP_Y);
+			_isLooping = true;
+			_musicPlayer->loop(2*_index + 1);
+			resetProgressBar();
+			_startTime = millis();
+			bmpDraw("/icons/repeatR.bmp", _tft, LOOP_X, LOOP_Y);
 
 		}
 }
@@ -418,24 +414,24 @@ void PlayScreen::onLoopClick(){
 // volume click works on pressed instead of release so we have to
 // check for time since hold every iteration to slow it down a bit
 void PlayScreen::onVolumeUpClick(){
-	if(millis() - (this->volDelay) > 200){
-		if(this->volume < 30){
-		this->volume += 2;
-		this->musicPlayer->volume(this->volume);
-		this->drawVolumeBar(this->volume);
-		this->volDelay = millis();
+	if(millis() - (_volDelay) > 200){
+		if(_volume < 30){
+		_volume += 2;
+		_musicPlayer->volume(_volume);
+		drawVolumeBar(_volume);
+		_volDelay = millis();
 		}
 	}
 }
 
 // same as previous but to decrease volume
 void PlayScreen::onVolumeDownClick(){
-	if(millis() - (this->volDelay) > 200){
-		if(this->volume > 0){
-			this->volume -= 2;
-			this->musicPlayer->volume(this->volume);
-			this->drawVolumeBar(this->volume);
-			this->volDelay = millis();
+	if(millis() - (_volDelay) > 200){
+		if(_volume > 0){
+			_volume -= 2;
+			_musicPlayer->volume(_volume);
+			drawVolumeBar(_volume);
+			_volDelay = millis();
 		}
 	}
 }

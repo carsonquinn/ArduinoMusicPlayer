@@ -31,7 +31,7 @@ TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
 
 // this constructor sets it to the default state
 Touch::Touch(){
-	this->state = NO_TOUCH;
+	_state = NO_TOUCH;
 }
 
 // set state and touch location according to action
@@ -41,22 +41,22 @@ void Touch::processTouch(){
 
 	if (p.z < MINPRESSURE || p.z > MAXPRESSURE) {
 		// this is called when the user is not touching the screen
-			if (this->state == B_DOWN){
-				this->state = B_UP;
-			} else if(this->state == B_UP){
-				this->state = NO_TOUCH;
-			} else if(this->state == PRESSED){
-				this->state = B_UP;
+			if (_state == B_DOWN){
+				_state = B_UP;
+			} else if(_state == B_UP){
+				_state = NO_TOUCH;
+			} else if(_state == PRESSED){
+				_state = B_UP;
 			}
 			// exit loop if there is no touch
 			return;
 
-	} else if (this->state == NO_TOUCH){
-		this->state = B_DOWN;
-	} else if (this->state == B_DOWN){
-		this->state = PRESSED;
-	} else if (this->state == B_UP){
-		this->state = B_DOWN;
+	} else if (_state == NO_TOUCH){
+		_state = B_DOWN;
+	} else if (_state == B_DOWN){
+		_state = PRESSED;
+	} else if (_state == B_UP){
+		_state = B_DOWN;
 	}
 
 	// Scale from 0->1000 to tft.width using the calibration #'s
@@ -65,33 +65,33 @@ void Touch::processTouch(){
 
 	// px and py are the coordinates of the touch if the screen was in vertical orientation.
 	// Convert the coordinates to horizontal coordinates for our purpose
-	this->tx = -(p.y - TH_WIDTH);
-	this->ty = p.x;
+	_tx = -(p.y - TH_WIDTH);
+	_ty = p.x;
 }
 
 // whether or not the touchscreen is being constantly being held
 bool Touch::isPressed(){
-	return this->state == PRESSED;
+	return _state == PRESSED;
 }
 
 // whether or not the touchscreen was just touched.
 bool Touch::isButtonDown(){
-	return this->state == B_DOWN;
+	return _state == B_DOWN;
 }
 
 // whether or not the touchscreen was just released. Will not repeat
 bool Touch::isButtonUp(){
-	return this->state == B_UP;
+	return _state == B_UP;
 }
 
 int Touch::getX(){
-	return this->tx;
+	return _tx;
 }
 
 int Touch::getY(){
-	return this->ty;
+	return _ty;
 }
 
 int Touch::getState(){
-	return this->state;
+	return _state;
 }

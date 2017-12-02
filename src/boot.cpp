@@ -58,27 +58,29 @@
 #define NO_TEXT 0
 #define TEXT 1
 
-// adafruit_ILI9341 *tft;
-Boot::Boot(Adafruit_ILI9341* tft){
-	// last time is the last animation time
-	this->tft = tft;
-    this->textState = NO_TEXT;
-    this->lastTime = 0;
+// default initialization
+Boot::Boot() { }
 
-    this->setScreen();
+// adafruit_ILI9341 *tft;
+Boot::Boot(Adafruit_ILI9341* tft) : _tft(tft) {
+	// last time is the last animation time
+    _textState = NO_TEXT;
+    _lastTime = 0;
+
+	setScreen();
 }
 
 // set screen items
 void Boot::setScreen(){
     // set icon
-    bmpDraw("/icons/main.bmp", this->tft, ICON_X, ICON_Y);
+    bmpDraw("/icons/main.bmp", _tft, ICON_X, ICON_Y);
 
     String title = "Arduino Music Player";
 
-    this->tft->setTextSize(2);
-    this->tft->setTextColor(RED);
-    this->tft->setCursor(SCREEN_W/2 - (title.length()/2)*12, TITLE_Y);
-	this->tft->print(title);
+    _tft->setTextSize(2);
+    _tft->setTextColor(RED);
+    _tft->setCursor(SCREEN_W/2 - (title.length()/2)*12, TITLE_Y);
+	_tft->print(title);
 }
 
 // set text animation if current time is greater than last animation time
@@ -86,23 +88,23 @@ void Boot::setScreen(){
 void Boot::animate(unsigned long rtime){
     String text = "Touch screen to begin!";
 
-    if (rtime - this->lastTime > 1000){
-        if (this->textState == NO_TEXT){
-            this->tft->setTextSize(2);
-            this->tft->setTextColor(RED);
-            this->tft->setCursor(SCREEN_W/2 - (text.length()/2)*12, TEXT_Y);
-        	this->tft->print(text);
+    if (rtime - _lastTime > 1000){
+        if (_textState == NO_TEXT){
+            _tft->setTextSize(2);
+            _tft->setTextColor(RED);
+            _tft->setCursor(SCREEN_W/2 - (text.length()/2)*12, TEXT_Y);
+        	_tft->print(text);
 
             // set class fields, set lastTime to current run time
             // set textState to TEXT since we wrote on screen
-            this->textState = TEXT;
-            this->lastTime = millis();
+            _textState = TEXT;
+            _lastTime = millis();
         }else{
             // draw empty rectangle to clear text box region
-            this->tft->fillRect(0, 0, SCREEN_W, ICON_Y, WHITE);
+            _tft->fillRect(0, 0, SCREEN_W, ICON_Y, WHITE);
             // set class fields
-            this->textState = NO_TEXT;
-            this->lastTime = millis();
+            _textState = NO_TEXT;
+            _lastTime = millis();
         }
     }
 }

@@ -4,10 +4,10 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_ILI9341.h>
 #include <DFRobotDFPlayerMini.h>
+#include "touch.h"
 #include "boot.h"
 #include "selectscreen.h"
 #include "playscreen.h"
-#include "touch.h"
 
 // TFT SD includes all the image files for
 // icons and music thumbnails, the actual music is
@@ -68,10 +68,12 @@ int main(){
 
 	// main objects for the screens and touch handler
 	// only Boot Screen is Initialized here, the rest are empty Initialized
-	Boot boot = Boot(&tft);
-	SelectScreen ss = SelectScreen(&tft);
-	PlayScreen ps = PlayScreen(&tft);
-	Touch touch = Touch();
+	Touch touch;
+	Boot boot;
+	SelectScreen ss;
+	PlayScreen ps;
+
+	boot = Boot(&tft);
 
   	while(true){
 		// code for Boot screen

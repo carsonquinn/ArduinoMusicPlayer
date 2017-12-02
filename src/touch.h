@@ -4,8 +4,8 @@
 class Touch{
 
 private:
-	int tx,ty;
-	int state;
+	int _tx, _ty;
+	int _state;
 
 public:
 	Touch();
