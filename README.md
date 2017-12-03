@@ -1,7 +1,7 @@
 # Arduino Music Player
 
 CMPUT-274 (Intro to Tangible Computing) final project with @kenboo98<br/>
-An Arduino Music Player built using DFRobot's [DF Player](https://www.dfrobot.com/product-1121.html "DF Player A mini...") mp3 module and Adafruit industries's [2.8" TFT](https://www.adafruit.com/product/1770 "2.8in TFT..."") Touch Shield.
+An Arduino Music Player built using DFRobot's [DF Player](https://www.dfrobot.com/product-1121.html "DF Player A mini...") mp3 module and Adafruit industries's [2.8" TFT](https://www.adafruit.com/product/1770 "2.8in TFT...") Touch Shield.
 
 ## Getting Started
 ### Hardware
