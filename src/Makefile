@@ -81,6 +81,3 @@ serial-0:	$(HOME)/.arduino_port_0 upload_0_set upload_check
 serial-1:	$(HOME)/.arduino_port_1 upload_1_set upload_check
 	$(MAKE) reset MONITOR_PORT=$(ARD_PORT)
 	$(MAKE) monitor MONITOR_PORT=$(ARD_PORT)
-
-check-hex: $(TARGET_HEX)
-	$(ARDUINO_UA_DIR)/bin/check-hex-file $(TARGET_HEX)
