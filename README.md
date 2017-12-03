@@ -5,7 +5,7 @@ An Arduino Music Player built using DFRobot's [DF Player](https://www.dfrobot.co
 
 ## Getting Started
 ### Hardware
-![Hardware Setup](https://github.com/dandua98/ArduinoMusicPlayer/raw/master/common/images/setup.jpg "Hardware")<br/>
+<img src="https://github.com/dandua98/ArduinoMusicPlayer/raw/master/common/images/setup.jpg" width="500"><br/>
 _Speaker missing in this image_<br/>
 To set up your hardware and wire it up, check [WIRING.md](https://github.com/dandua98/ArduinoMusicPlayer/blob/master/WIRING.md) for a detailed explanation and schematics.
 
@@ -119,11 +119,12 @@ _musicPlayer->play(2*index + 1);
 ```
 
 ### Usage
-![Boot screen](https://github.com/dandua98/ArduinoMusicPlayer/raw/master/common/images/boot.jpg "boot screen")![Boot Screen 2](https://github.com/dandua98/ArduinoMusicPlayer/raw/master/common/images/boot2.jpg "boot screen")<br/>
-__1.__ Simply touch anywhere on screen to get to the selectScreen, there's a flashing text animation for that!<br/>
-![Boot screen](https://github.com/dandua98/ArduinoMusicPlayer/raw/master/common/images/selectscreen.jpg "select screen")
-__2.__ Clicking on an album art on select screen would display it's details. Another click on the same album would take you to play screen. Use left and right arrows (the whole side region would work) to navigate. When returning to select screen from play screen, the music continues playing unless paused.
-![Boot screen](https://github.com/dandua98/ArduinoMusicPlayer/raw/master/common/images/playscreen.jpg "play screen")
+<img src="https://github.com/dandua98/ArduinoMusicPlayer/raw/master/common/images/boot.jpg" width="280" height = "200">
+<img src="https://github.com/dandua98/ArduinoMusicPlayer/raw/master/common/images/boot2.jpg" width="280" height = '200'> <br/><br/>
+__1.__ Simply touch anywhere on screen to get to the selectScreen, there's a flashing text animation for that!<br/><br/>
+<img src="https://github.com/dandua98/ArduinoMusicPlayer/raw/master/common/images/selectscreen.jpg" width="350"><br/><br/>
+__2.__ Clicking on an album art on select screen would display it's details. Another click on the same album would take you to play screen. Use left and right arrows (the whole side region would work) to navigate. When returning to select screen from play screen, the music continues playing unless paused.<br/><br/>
+<img src="https://github.com/dandua98/ArduinoMusicPlayer/raw/master/common/images/playscreen.jpg" width="350"><br/><br/>
 __3.__ If you selected a song, you'll see this screen, also called the play screen. Clicking on album art takes you back to the menu. The pause button turns to play on click and vice-versa. The plus and minus buttons are used for volume (the grey line is the volume bar). The red bar at the bottom is the progress bar and the forward and backwards arrows take you to next or last song. The loop button turns red on being activated.<br/>
 
 ## Authors
