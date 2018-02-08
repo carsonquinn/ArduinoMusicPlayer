@@ -1,28 +1,26 @@
 Wiring for ArduinoMusicPlayer
 =============================
 
-This document explains how to wire and set up the hardware for Arduino Music
-Player. I used DF Robot's mp3 module [DFPlayer](https://www.dfrobot.com/product-1121.html "DFPlayer For Arduino")
-to read mp3 files and an [Adafruit ILI9341](https://www.adafruit.com/product/1770 "2.8 TFT LCD with...") touchscreen
-breakout to display the GUI. Both the screen and DFPlayer would need separate MicroSDs since DFPlayer's
-library doesn't allow for MicroSD reads, it just takes music function requests over serial. I need to read icon files and music tags
-to display my GUI and hence the second MicroSD is necessary. It shouldn't be too hard to edit DF Robot's library though
-since I believe they're using the standard SD and SPI libraries too but if not, you can implement that.
-I'll link all the libraries I used (for touchscreen and DFPlayer) in my [README](https://github.com/dandua98/ArduinoMusicPlayer/blob/master/README.md "README.md"). For my speaker, I used
+This document explains how to wire and set up the hardware for the Arduino Music
+Player. We used DF Robot's MP3 module [DFPlayer](https://www.dfrobot.com/product-1121.html "DFPlayer For Arduino")
+to read mp3 files and Adafruit's [Adafruit ILI9341](https://www.adafruit.com/product/1770 "2.8 TFT LCD with...") touchscreen
+display for the GUI. Both the screen and DFPlayer would need separate MicroSD cards since DFPlayer's
+library does not allow for MicroSD reads and it only takes music function requests over serial. The second microSD card is needed to display song data and album art on the TFT display. 
+All the libraries used (for touchscreen and DFPlayer) are in the [README](https://github.com/dandua98/ArduinoMusicPlayer/blob/master/README.md "README.md"). For speakers, we used
 Gikfun's [5W EK1688](https://www.amazon.ca/Gikfun-Speaker-Stereo-Woofer-Arduino/dp/B0154KLTNM/ref=sr_1_1?ie=UTF8&qid=1511999750&sr=8-1&keywords=gikfun+speaker "Gikfun 2 8 Ohm 5W Audio..."). DFPlayer's documentation says it can only power speakers less than 3W but this one worked perfectly!
 
 ## Hardware
 
 * Arduino Mega 2560<br/>
-> _can use an Uno too_
+> _can use an Uno as well_
 * DF Robot's [DFPlayer mini](https://www.dfrobot.com/product-1121.html "DFPlayer For Arduino") <br/>
->_Could use an amplifier in conjuction with [TMRpcm](https://github.com/TMRh20/TMRpcm "asynchronous playback of PCM/WAV...") library for wav/pcm playback instead, that was my first option but the sound was with mostly static even with 0.25W speakers_<br/>
-* Micro SD cards <br/>
->_had to use seperate SDs for the DF Player Mini module and Adafruit's screen_
-* A TFT screen for GUI (_I used [Adafruit ILI9341](https://www.adafruit.com/product/1770 "2.8 TFT LCD with...")_)
-* Speaker/s, preferably less than 3W
+>_Could use an amplifier in conjuction with [TMRpcm](https://github.com/TMRh20/TMRpcm "asynchronous playback of PCM/WAV...") library for wav/pcm playback instead. That was our first option but we only got static even with 0.25W speakers_<br/>
+* 2 Micro SD cards <br/>
+>_had to use seperate SD cards for the DF Player Mini module and Adafruit's screen_
+* A TFT screen for GUI (_We used [Adafruit ILI9341](https://www.adafruit.com/product/1770 "2.8 TFT LCD with...")_)
+* Speaker(s), preferably less than 3W
 * Breadboard and wires for testing <br/>
->_plan to 3D print an enclosure, DFPlayer also supports headphones although you'd need your own headphone jack_
+>_DFPlayer also supports headphones although you will need your own headphone jack_
 
 
 ## Wiring Schematic
@@ -63,7 +61,7 @@ _image by [Adafruit](https://www.adafruit.com "Adafruit")_
 | Y-              | 5          |
 | X-              | A3         |
 | CCS             | 6          |
-> Not using the 8 bit data transfer mode pin
+
 
 ## Authors
 * __Danish Dua__ - _Software engineering student at University of Alberta_ - [GitHub](https://github.com/dandua98)
