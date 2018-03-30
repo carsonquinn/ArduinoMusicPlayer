@@ -1,3 +1,5 @@
+<p align="center"><img src="common/icons/horizontal.png" alt="ArduinoMusicPlayer" height="150px"></p>
+
 # Arduino Music Player
 
 CMPUT-274 (Intro to Tangible Computing) final project by @DanishDua and @kenboo98<br/>
