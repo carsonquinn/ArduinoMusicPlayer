@@ -1,3 +1,5 @@
+<p align="center"><img src="common/icons/horizontal.png" alt="ArduinoMusicPlayer" height="150px"></p>
+
 Wiring for ArduinoMusicPlayer
 =============================
 
@@ -5,7 +7,7 @@ This document explains how to wire and set up the hardware for the Arduino Music
 Player. We used DF Robot's MP3 module [DFPlayer](https://www.dfrobot.com/product-1121.html "DFPlayer For Arduino")
 to read mp3 files and Adafruit's [Adafruit ILI9341](https://www.adafruit.com/product/1770 "2.8 TFT LCD with...") touchscreen
 display for the GUI. Both the screen and DFPlayer would need separate MicroSD cards since DFPlayer's
-library does not allow for MicroSD reads and it only takes music function requests over serial. The second microSD card is needed to display song data and album art on the TFT display. 
+library does not allow for MicroSD reads and it only takes music function requests over serial. The second microSD card is needed to display song data and album art on the TFT display.
 All the libraries used (for touchscreen and DFPlayer) are in the [README](https://github.com/dandua98/ArduinoMusicPlayer/blob/master/README.md "README.md"). For speakers, we used
 Gikfun's [5W EK1688](https://www.amazon.ca/Gikfun-Speaker-Stereo-Woofer-Arduino/dp/B0154KLTNM/ref=sr_1_1?ie=UTF8&qid=1511999750&sr=8-1&keywords=gikfun+speaker "Gikfun 2 8 Ohm 5W Audio..."). DFPlayer's documentation says it can only power speakers less than 3W but this one worked perfectly!
 

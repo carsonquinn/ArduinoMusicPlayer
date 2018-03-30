@@ -137,6 +137,9 @@ __3.__ After selecting a song, you are taken to this screen. Clicking on album a
 * __Danish Dua__ - _Software engineering student at University of Alberta_ - [GitHub](https://github.com/dandua98)
 * __Kenta Tellambura__ - _Software engineering student at University of Alberta_ - [GitHub](https://github.com/kenboo98)
 
+## Contributors
+* __Komiser Back__ - _Logo design for Arduino Music Player_ - [GitHub](https://github.com/reallinfo)
+
 ## License
 The project is licensed under GPL 3.0 - see the [LICENSE](https://github.com/dandua98/ArduinoMusicPlayer/blob/master/LICENSE "LICENSE") file for details
 
